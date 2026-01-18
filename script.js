@@ -727,36 +727,54 @@ function downloadResult() {
                 // 다운로드 함수
                 const downloadImage = (dataUrl) => {
                     try {
-                        const link = document.createElement('a');
-                        link.download = '기질유형테스트_결과_' + new Date().getTime() + '.png';
-                        link.href = dataUrl;
-                        link.style.display = 'none';
+                        // 파일명 생성
+                        const fileName = '기질유형테스트_결과_' + new Date().getTime() + '.png';
                         
-                        // 사파리 호환성을 위해 body에 추가
+                        const link = document.createElement('a');
+                        link.download = fileName;
+                        link.href = dataUrl;
+                        link.setAttribute('download', fileName); // 명시적으로 설정
+                        link.setAttribute('target', '_self'); // 새 탭에서 열리지 않도록
+                        link.style.display = 'none';
+                        link.style.position = 'absolute';
+                        link.style.left = '-9999px';
+                        link.style.visibility = 'hidden';
+                        
+                        // 클릭 이벤트 핸들러 추가 (기본 동작 방지)
+                        link.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                        }, true);
+                        
+                        // body에 추가
                         document.body.appendChild(link);
                         
-                        // 다운로드 트리거
-                        if (document.createEvent) {
-                            const event = document.createEvent('MouseEvents');
-                            event.initEvent('click', true, true);
-                            link.dispatchEvent(event);
-                        } else {
-                            link.click();
-                        }
-                        
-                        // 정리
+                        // 약간의 지연 후 클릭 (렌더링 완료 보장)
                         setTimeout(() => {
-                            if (link.parentNode) {
-                                document.body.removeChild(link);
+                            // 직접 click() 호출 (가장 확실한 방법)
+                            if (typeof link.click === 'function') {
+                                link.click();
+                            } else {
+                                // click()이 없는 경우 이벤트 발생
+                                const clickEvent = new MouseEvent('click', {
+                                    view: window,
+                                    bubbles: true,
+                                    cancelable: true,
+                                    buttons: 1
+                                });
+                                link.dispatchEvent(clickEvent);
                             }
-                            if (dataUrl.startsWith('blob:')) {
-                                URL.revokeObjectURL(dataUrl);
-                            }
-                        }, 1000);
-                        
-                        // 버튼 복원
-                        downloadBtn.innerHTML = originalHTML;
-                        downloadBtn.disabled = false;
+                            
+                            // 정리
+                            setTimeout(() => {
+                                if (link.parentNode) {
+                                    document.body.removeChild(link);
+                                }
+                                
+                                // 버튼 복원
+                                downloadBtn.innerHTML = originalHTML;
+                                downloadBtn.disabled = false;
+                            }, 200);
+                        }, 100);
                     } catch (downloadErr) {
                         console.error('다운로드 실패:', downloadErr);
                         alert('다운로드에 실패했습니다: ' + downloadErr.message);
@@ -765,23 +783,9 @@ function downloadResult() {
                     }
                 };
                 
-                // Blob 방식 시도 (최고 품질)
-                if (canvas.toBlob) {
-                    canvas.toBlob(function(blob) {
-                        if (blob) {
-                            const url = URL.createObjectURL(blob);
-                            downloadImage(url);
-                        } else {
-                            // Blob 실패 시 data URL 사용 (최고 품질)
-                            const dataUrl = canvas.toDataURL('image/png', 1.0);
-                            downloadImage(dataUrl);
-                        }
-                    }, 'image/png', 1.0); // 최고 품질 (1.0)
-                } else {
-                    // toBlob이 없는 경우 data URL 사용 (최고 품질)
-                    const dataUrl = canvas.toDataURL('image/png', 1.0);
-                    downloadImage(dataUrl);
-                }
+                // data URL을 직접 사용 (Safari 호환성 향상)
+                const dataUrl = canvas.toDataURL('image/png', 1.0);
+                downloadImage(dataUrl);
             }).catch(err => {
                 // blur 효과 복원
                 originalBlurStyles.forEach(state => {
