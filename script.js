@@ -461,10 +461,12 @@ function downloadResult() {
             wrapper.style.top = '0';
             wrapper.style.width = resultContent.offsetWidth + 'px';
             wrapper.style.backgroundColor = '#ffffff';
-            wrapper.style.paddingTop = '60px'; // 충분한 상단 여백
-            wrapper.style.paddingBottom = '40px'; // 하단 여백
+            wrapper.style.paddingTop = '120px'; // 충분한 상단 여백 (100px -> 120px)
+            wrapper.style.paddingBottom = '60px'; // 하단 여백
             wrapper.style.paddingLeft = '0';
             wrapper.style.paddingRight = '0';
+            wrapper.style.boxSizing = 'border-box';
+            wrapper.style.display = 'block';
             
             // 원본 요소 복제
             const clonedContent = resultContent.cloneNode(true);
@@ -473,36 +475,52 @@ function downloadResult() {
             clonedContent.style.position = 'relative';
             clonedContent.style.margin = '0';
             clonedContent.style.paddingTop = '0'; // 래퍼의 패딩 사용
+            clonedContent.style.width = '100%';
+            clonedContent.style.boxSizing = 'border-box';
             
             wrapper.appendChild(clonedContent);
             document.body.appendChild(wrapper);
             
-            // html2canvas로 캡처 (고해상도)
-            html2canvas(wrapper, {
-                backgroundColor: '#ffffff', // 순수 흰색 배경으로 변경
-                scale: 3, // 해상도 3배로 증가 (더 선명하게)
-                useCORS: true,
-                logging: false, // 디버깅 비활성화
-                allowTaint: true, // 이미지 로딩을 위해 true로 변경
-                foreignObjectRendering: true, // 텍스트 렌더링 개선
-                removeContainer: true,
-                imageTimeout: 30000, // 이미지 타임아웃 증가
-                letterRendering: true, // 텍스트 선명도 향상
-                width: wrapper.offsetWidth,
-                height: wrapper.offsetHeight,
-                onclone: function(clonedDoc, element) {
-                    // 클론된 요소에 상단 여백 추가
-                    const clonedResult = clonedDoc.getElementById('result-screen-clone');
-                    if (clonedResult) {
-                        clonedResult.style.paddingTop = '0';
-                        clonedResult.style.marginTop = '0';
-                    }
-                    // 래퍼의 패딩 확인
-                    const clonedWrapper = element;
-                    if (clonedWrapper) {
-                        clonedWrapper.style.paddingTop = '60px';
-                        clonedWrapper.style.paddingBottom = '40px';
-                    }
+            // 래퍼의 실제 높이 계산 (콘텐츠 + 패딩)
+            const wrapperHeight = clonedContent.scrollHeight + 120 + 60; // 콘텐츠 높이 + 상단 패딩(120px) + 하단 패딩(60px)
+            wrapper.style.height = wrapperHeight + 'px';
+            
+            // 약간의 대기 시간을 두어 렌더링 완료 보장 후 캡처
+            setTimeout(() => {
+                // html2canvas로 캡처 (고해상도)
+                html2canvas(wrapper, {
+                    backgroundColor: '#ffffff', // 순수 흰색 배경으로 변경
+                    scale: 3, // 해상도 3배로 증가 (더 선명하게)
+                    useCORS: true,
+                    logging: false, // 디버깅 비활성화
+                    allowTaint: true, // 이미지 로딩을 위해 true로 변경
+                    foreignObjectRendering: true, // 텍스트 렌더링 개선
+                    removeContainer: true,
+                    imageTimeout: 30000, // 이미지 타임아웃 증가
+                    letterRendering: true, // 텍스트 선명도 향상
+                    width: wrapper.offsetWidth,
+                    height: wrapperHeight,
+                    onclone: function(clonedDoc, element) {
+                        // 클론된 요소에 상단 여백 추가
+                        const clonedResult = clonedDoc.getElementById('result-screen-clone');
+                        if (clonedResult) {
+                            clonedResult.style.paddingTop = '0';
+                            clonedResult.style.marginTop = '0';
+                        }
+                        // 래퍼의 패딩 확인 및 강제 설정
+                        const clonedWrapper = element;
+                        if (clonedWrapper) {
+                            clonedWrapper.style.paddingTop = '120px';
+                            clonedWrapper.style.paddingBottom = '60px';
+                            clonedWrapper.style.backgroundColor = '#ffffff';
+                            clonedWrapper.style.boxSizing = 'border-box';
+                            clonedWrapper.style.display = 'block';
+                            clonedWrapper.style.width = resultContent.offsetWidth + 'px';
+                            const clonedResultScreen = clonedDoc.getElementById('result-screen-clone');
+                            if (clonedResultScreen) {
+                                clonedWrapper.style.height = (clonedResultScreen.scrollHeight + 120 + 60) + 'px';
+                            }
+                        }
                     // 클론된 문서의 이미지를 data URL로 교체
                     const clonedImages = clonedDoc.querySelectorAll('img');
                     clonedImages.forEach((img, index) => {
@@ -632,7 +650,10 @@ function downloadResult() {
                         }
                     });
                 }
-            }).then(canvas => {
+                }).then(canvas => {
+                    return canvas;
+                });
+            }, 100).then(canvas => {
                 // 래퍼 제거
                 if (wrapper && wrapper.parentNode) {
                     document.body.removeChild(wrapper);
