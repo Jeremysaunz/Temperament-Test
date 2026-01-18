@@ -263,37 +263,74 @@ function downloadResult() {
         btn.style.display = 'none';
     });
     
-    // 이미지 로딩 대기 (간단한 방식)
+    // 이미지 로딩 대기 (강화된 방식)
     const images = resultContent.querySelectorAll('img');
     const imagePromises = [];
     
-    images.forEach(img => {
-        if (img.complete && img.naturalHeight !== 0) {
-            // 이미 로드됨
-            return;
-        } else {
-            // 로딩 대기
-            const promise = new Promise((resolve) => {
-                if (img.complete) {
-                    resolve();
-                } else {
-                    img.onload = resolve;
-                    img.onerror = resolve; // 에러가 나도 계속 진행
-                }
-            });
-            imagePromises.push(promise);
+    images.forEach((img, index) => {
+        // 이미지 경로를 절대 경로로 변환
+        if (img.src && !img.src.startsWith('http') && !img.src.startsWith('data:')) {
+            const imgPath = img.getAttribute('src');
+            if (imgPath) {
+                // 상대 경로를 절대 경로로 변환
+                const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+                img.src = baseUrl + imgPath;
+            }
         }
+        
+        // 이미지 로딩 보장
+        const promise = new Promise((resolve) => {
+            if (img.complete && img.naturalHeight !== 0 && img.naturalWidth !== 0) {
+                // 이미 로드됨
+                console.log(`이미지 ${index} 이미 로드됨:`, img.src);
+                resolve();
+            } else {
+                // 새로 로드
+                const loadHandler = () => {
+                    console.log(`이미지 ${index} 로드 완료:`, img.src);
+                    resolve();
+                };
+                const errorHandler = () => {
+                    console.warn(`이미지 ${index} 로드 실패:`, img.src);
+                    // 에러가 나도 계속 진행 (대체 텍스트 표시)
+                    resolve();
+                };
+                
+                img.onload = loadHandler;
+                img.onerror = errorHandler;
+                
+                // 이미지가 로드되지 않았으면 강제로 다시 로드
+                if (!img.complete) {
+                    const newImg = new Image();
+                    newImg.crossOrigin = 'anonymous';
+                    newImg.onload = () => {
+                        img.src = newImg.src;
+                        loadHandler();
+                    };
+                    newImg.onerror = errorHandler;
+                    newImg.src = img.src;
+                }
+            }
+        });
+        imagePromises.push(promise);
     });
     
     // 모든 이미지 로딩 대기 또는 타임아웃
     Promise.race([
         Promise.all(imagePromises),
-        new Promise(resolve => setTimeout(resolve, 2000)) // 최대 2초 대기
+        new Promise(resolve => setTimeout(resolve, 3000)) // 최대 3초 대기
     ]).then(() => {
-        // 약간의 추가 대기 후 캡처
+        // 이미지가 제대로 로드되었는지 확인
+        images.forEach((img, index) => {
+            if (!img.complete || img.naturalHeight === 0) {
+                console.warn(`이미지 ${index} 로드 실패 확인:`, img.src);
+            }
+        });
+        
+        // 약간의 추가 대기 후 캡처 (이미지 렌더링 시간 확보)
         setTimeout(() => {
             captureAndDownload();
-        }, 300);
+        }, 500);
     });
     
     function captureAndDownload() {
@@ -316,13 +353,39 @@ function downloadResult() {
                 backgroundColor: '#ffffff', // 순수 흰색 배경으로 변경
                 scale: 3, // 해상도 3배로 증가 (더 선명하게)
                 useCORS: true,
-                logging: false,
-                allowTaint: false,
+                logging: true, // 디버깅을 위해 활성화
+                allowTaint: true, // 이미지 로딩을 위해 true로 변경
                 foreignObjectRendering: true, // 텍스트 렌더링 개선
                 removeContainer: false,
-                imageTimeout: 20000,
+                imageTimeout: 30000, // 이미지 타임아웃 증가
                 letterRendering: true, // 텍스트 선명도 향상
                 onclone: function(clonedDoc, element) {
+                    // 클론된 문서의 이미지 경로를 절대 경로로 변환
+                    const clonedImages = clonedDoc.querySelectorAll('img');
+                    clonedImages.forEach((img, index) => {
+                        if (img.src && !img.src.startsWith('http') && !img.src.startsWith('data:')) {
+                            const imgPath = img.getAttribute('src');
+                            if (imgPath) {
+                                const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+                                img.src = baseUrl + imgPath;
+                                console.log(`클론 이미지 ${index} 경로 변환:`, img.src);
+                            }
+                        }
+                        
+                        // 이미지 스타일 강제
+                        img.style.display = 'block';
+                        img.style.visibility = 'visible';
+                        img.style.opacity = '1';
+                        
+                        // 이미지가 로드되지 않았으면 대체 처리
+                        if (!img.complete || img.naturalHeight === 0) {
+                            console.warn(`클론 이미지 ${index} 로드 실패, 대체 처리`);
+                            const parent = img.parentElement;
+                            if (parent && parent.tagName === 'DIV') {
+                                parent.innerHTML = '<span style="color: #0284c7; font-weight: bold; font-size: 12px;">FLOW LAB</span>';
+                            }
+                        }
+                    });
                     // 클론된 문서에서도 버튼 숨기기
                     const clonedButtons = clonedDoc.querySelectorAll('button');
                     clonedButtons.forEach(btn => {
@@ -352,23 +415,48 @@ function downloadResult() {
                         resultScreen.style.backgroundColor = '#ffffff';
                     }
                     
-                    // 로고 이미지가 잘 보이도록 스타일 강제
+                    // 로고 이미지가 잘 보이도록 스타일 강제 및 재로딩
                     const logoImages = clonedDoc.querySelectorAll('img[src*="fl_logo"]');
-                    logoImages.forEach(img => {
+                    logoImages.forEach((img, index) => {
+                        // 이미지 경로를 절대 경로로 변환
+                        if (img.src && !img.src.startsWith('http') && !img.src.startsWith('data:')) {
+                            const imgPath = img.getAttribute('src');
+                            if (imgPath) {
+                                const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+                                img.src = baseUrl + imgPath;
+                            }
+                        }
+                        
+                        // 이미지 스타일 강제
                         img.style.width = '100%';
                         img.style.height = '100%';
                         img.style.maxWidth = '100%';
                         img.style.maxHeight = '100%';
                         img.style.objectFit = 'contain';
                         img.style.display = 'block';
+                        img.style.visibility = 'visible';
+                        img.style.opacity = '1';
                         img.style.borderRadius = '50%';
                         img.style.filter = 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))';
-                        // 이미지 로드 실패 시 대체 텍스트 표시
+                        
+                        // 이미지가 로드되지 않았으면 강제로 다시 로드
                         if (!img.complete || img.naturalHeight === 0) {
-                            const parent = img.parentElement;
-                            if (parent && parent.tagName === 'DIV') {
-                                parent.innerHTML = '<span class="text-brand-600 font-bold text-xs">FLOW LAB</span>';
-                            }
+                            console.log(`로고 이미지 ${index} 재로딩 시도:`, img.src);
+                            const newImg = new Image();
+                            newImg.crossOrigin = 'anonymous';
+                            newImg.onload = () => {
+                                img.src = newImg.src;
+                                img.style.display = 'block';
+                                img.style.visibility = 'visible';
+                            };
+                            newImg.onerror = () => {
+                                console.warn(`로고 이미지 ${index} 로드 실패, 대체 텍스트 표시`);
+                                const parent = img.parentElement;
+                                if (parent && parent.tagName === 'DIV') {
+                                    parent.innerHTML = '<span style="color: #0284c7; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; height: 100%;">FLOW LAB</span>';
+                                }
+                            };
+                            newImg.src = img.src;
                         }
                     });
                     
@@ -386,6 +474,8 @@ function downloadResult() {
                             container.style.background = 'linear-gradient(to bottom right, #f0f9ff, #ffffff)';
                             container.style.boxShadow = '0 10px 25px -5px rgba(14, 165, 233, 0.2), 0 4px 6px -2px rgba(14, 165, 233, 0.1)';
                             container.style.padding = '4px';
+                            container.style.visibility = 'visible';
+                            container.style.opacity = '1';
                         }
                     });
                     
