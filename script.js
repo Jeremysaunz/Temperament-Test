@@ -242,15 +242,16 @@ function downloadResult() {
     const originalBackground = resultContent.style.background;
     const originalBackgroundColor = resultContent.style.backgroundColor;
     
-    // 원본 요소를 보이게 만들기 (캡처를 위해)
-    resultContent.classList.remove('hidden');
-    resultContent.style.position = 'fixed';
-    resultContent.style.left = '0';
-    resultContent.style.top = '0';
-    resultContent.style.zIndex = '9999';
-    resultContent.style.width = resultContent.offsetWidth + 'px';
-    resultContent.style.background = '#ffffff'; // 흰색 배경 강제
-    resultContent.style.backgroundColor = '#ffffff';
+            // 원본 요소를 보이게 만들기 (캡처를 위해)
+            resultContent.classList.remove('hidden');
+            resultContent.style.position = 'fixed';
+            resultContent.style.left = '0';
+            resultContent.style.top = '20px'; // 상단 여백 추가
+            resultContent.style.zIndex = '9999';
+            resultContent.style.width = resultContent.offsetWidth + 'px';
+            resultContent.style.background = '#ffffff'; // 흰색 배경 강제
+            resultContent.style.backgroundColor = '#ffffff';
+            resultContent.style.paddingTop = '24px'; // 상단 패딩 추가
     
     // 버튼들을 임시로 숨기기
     const buttons = resultContent.querySelectorAll('button');
@@ -378,13 +379,23 @@ function downloadResult() {
                 backgroundColor: '#ffffff', // 순수 흰색 배경으로 변경
                 scale: 3, // 해상도 3배로 증가 (더 선명하게)
                 useCORS: true,
-                logging: true, // 디버깅을 위해 활성화
+                logging: false, // 디버깅 비활성화
                 allowTaint: true, // 이미지 로딩을 위해 true로 변경
                 foreignObjectRendering: true, // 텍스트 렌더링 개선
                 removeContainer: false,
                 imageTimeout: 30000, // 이미지 타임아웃 증가
                 letterRendering: true, // 텍스트 선명도 향상
+                x: 0,
+                y: 0,
+                windowWidth: resultContent.scrollWidth,
+                windowHeight: resultContent.scrollHeight + 40, // 상단 여백을 위해 높이 추가
                 onclone: function(clonedDoc, element) {
+                    // 클론된 요소에 상단 여백 추가
+                    const clonedResult = clonedDoc.getElementById('result-screen');
+                    if (clonedResult) {
+                        clonedResult.style.paddingTop = '24px';
+                        clonedResult.style.marginTop = '20px';
+                    }
                     // 클론된 문서의 이미지를 data URL로 교체
                     const clonedImages = clonedDoc.querySelectorAll('img');
                     clonedImages.forEach((img, index) => {
