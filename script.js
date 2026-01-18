@@ -149,47 +149,47 @@ function showResult() {
         const isPrimary = index === primaryIndex;
         const isSecondary = index === secondaryIndex;
         
-        let bgClass, borderClass, textClass, barClass;
+        let bgClass, borderClass, textClass, barClass, rankClass;
         if (isPrimary) {
             bgClass = 'bg-brand-50';
+            borderClass = 'border-brand-400';
+            textClass = 'text-brand-700';
+            barClass = 'bg-brand-500';
+            rankClass = 'text-brand-600';
+        } else if (isSecondary) {
+            bgClass = 'bg-brand-50/50';
             borderClass = 'border-brand-300';
             textClass = 'text-brand-600';
-            barClass = 'bg-brand-500';
-        } else if (isSecondary) {
-            bgClass = 'bg-slate-50';
-            borderClass = 'border-slate-300';
-            textClass = 'text-slate-600';
-            barClass = 'bg-slate-500';
+            barClass = 'bg-brand-400';
+            rankClass = 'text-brand-500';
         } else {
-            bgClass = 'bg-white';
+            bgClass = 'bg-slate-50';
             borderClass = 'border-slate-200';
-            textClass = 'text-slate-700';
-            barClass = 'bg-slate-400';
+            textClass = 'text-slate-600';
+            barClass = 'bg-slate-300';
+            rankClass = 'text-slate-500';
         }
         
         const row = document.createElement('div');
-        row.className = `p-4 rounded-xl border-2 transition-all ${bgClass} ${borderClass} ${isPrimary || isSecondary ? 'shadow-md' : ''}`;
+        row.className = `p-2 rounded-lg border transition-all ${bgClass} ${borderClass}`;
         
         row.innerHTML = `
-            <div class="flex items-center justify-between mb-2">
-                <div class="flex items-center gap-2">
-                    <span class="text-lg font-bold ${textClass}">
+            <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-1.5 flex-1 min-w-0">
+                    <span class="text-xs font-bold ${rankClass} whitespace-nowrap">
                         ${displayIdx + 1}위
                     </span>
-                    <span class="text-base font-semibold ${isPrimary ? 'text-brand-700' : isSecondary ? 'text-slate-700' : 'text-slate-800'}">
-                        ${type.name}
+                    <span class="text-xs font-semibold ${textClass} truncate">
+                        ${type.name.split('(')[0].trim()}
                     </span>
                 </div>
-                <div class="text-right">
-                    <div class="text-2xl font-bold ${textClass}">
+                <div class="text-right ml-2">
+                    <div class="text-sm font-bold ${textClass}">
                         ${score}점
-                    </div>
-                    <div class="text-xs text-slate-500 mt-0.5">
-                        ${percent.toFixed(1)}%
                     </div>
                 </div>
             </div>
-            <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-1.5 w-full bg-white rounded-full overflow-hidden">
                 <div class="h-full ${barClass} transition-all duration-500" 
                      style="width: ${percent}%"></div>
             </div>
