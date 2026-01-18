@@ -263,74 +263,99 @@ function downloadResult() {
         btn.style.display = 'none';
     });
     
-    // 이미지 로딩 대기 (강화된 방식)
+    // 이미지를 base64로 변환하여 로드 보장
     const images = resultContent.querySelectorAll('img');
-    const imagePromises = [];
+    const imageDataUrls = new Map();
     
-    images.forEach((img, index) => {
-        // 이미지 경로를 절대 경로로 변환
-        if (img.src && !img.src.startsWith('http') && !img.src.startsWith('data:')) {
+    // 모든 이미지를 base64로 변환
+    const imagePromises = Array.from(images).map((img, index) => {
+        return new Promise((resolve) => {
             const imgPath = img.getAttribute('src');
-            if (imgPath) {
-                // 상대 경로를 절대 경로로 변환
-                const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-                img.src = baseUrl + imgPath;
-            }
-        }
-        
-        // 이미지 로딩 보장
-        const promise = new Promise((resolve) => {
-            if (img.complete && img.naturalHeight !== 0 && img.naturalWidth !== 0) {
-                // 이미 로드됨
-                console.log(`이미지 ${index} 이미 로드됨:`, img.src);
+            if (!imgPath) {
                 resolve();
+                return;
+            }
+            
+            // 이미 data URL이면 그대로 사용
+            if (imgPath.startsWith('data:')) {
+                imageDataUrls.set(img, imgPath);
+                resolve();
+                return;
+            }
+            
+            // 이미지 경로를 절대 경로로 변환
+            let absolutePath = imgPath;
+            if (!imgPath.startsWith('http') && !imgPath.startsWith('data:')) {
+                const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+                absolutePath = baseUrl + imgPath;
+            }
+            
+            // 이미지가 이미 로드되어 있으면 바로 변환
+            if (img.complete && img.naturalHeight !== 0 && img.naturalWidth !== 0) {
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const dataUrl = canvas.toDataURL('image/png');
+                    imageDataUrls.set(img, dataUrl);
+                    console.log(`이미지 ${index} base64 변환 완료 (기존 로드)`);
+                    resolve();
+                } catch (e) {
+                    console.warn(`이미지 ${index} base64 변환 실패:`, e);
+                    // 새로 로드 시도
+                    loadImageAsBase64(absolutePath, img, index, resolve);
+                }
             } else {
                 // 새로 로드
-                const loadHandler = () => {
-                    console.log(`이미지 ${index} 로드 완료:`, img.src);
-                    resolve();
-                };
-                const errorHandler = () => {
-                    console.warn(`이미지 ${index} 로드 실패:`, img.src);
-                    // 에러가 나도 계속 진행 (대체 텍스트 표시)
-                    resolve();
-                };
-                
-                img.onload = loadHandler;
-                img.onerror = errorHandler;
-                
-                // 이미지가 로드되지 않았으면 강제로 다시 로드
-                if (!img.complete) {
-                    const newImg = new Image();
-                    newImg.crossOrigin = 'anonymous';
-                    newImg.onload = () => {
-                        img.src = newImg.src;
-                        loadHandler();
-                    };
-                    newImg.onerror = errorHandler;
-                    newImg.src = img.src;
-                }
+                loadImageAsBase64(absolutePath, img, index, resolve);
             }
         });
-        imagePromises.push(promise);
     });
     
-    // 모든 이미지 로딩 대기 또는 타임아웃
-    Promise.race([
-        Promise.all(imagePromises),
-        new Promise(resolve => setTimeout(resolve, 3000)) // 최대 3초 대기
-    ]).then(() => {
-        // 이미지가 제대로 로드되었는지 확인
-        images.forEach((img, index) => {
-            if (!img.complete || img.naturalHeight === 0) {
-                console.warn(`이미지 ${index} 로드 실패 확인:`, img.src);
+    // 이미지를 base64로 로드하는 헬퍼 함수
+    function loadImageAsBase64(url, originalImg, index, resolve) {
+        const newImg = new Image();
+        newImg.crossOrigin = 'anonymous';
+        
+        newImg.onload = () => {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = newImg.naturalWidth;
+                canvas.height = newImg.naturalHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(newImg, 0, 0);
+                const dataUrl = canvas.toDataURL('image/png');
+                imageDataUrls.set(originalImg, dataUrl);
+                console.log(`이미지 ${index} base64 변환 완료:`, url);
+                resolve();
+            } catch (e) {
+                console.error(`이미지 ${index} base64 변환 오류:`, e);
+                resolve(); // 에러가 나도 계속 진행
             }
+        };
+        
+        newImg.onerror = () => {
+            console.warn(`이미지 ${index} 로드 실패:`, url);
+            resolve(); // 에러가 나도 계속 진행
+        };
+        
+        newImg.src = url;
+    }
+    
+    // 모든 이미지 로딩 대기
+    Promise.all(imagePromises).then(() => {
+        // base64로 변환된 이미지들을 원본 이미지 src에 적용
+        imageDataUrls.forEach((dataUrl, img) => {
+            img.src = dataUrl;
+            console.log('이미지 src를 data URL로 교체');
         });
         
         // 약간의 추가 대기 후 캡처 (이미지 렌더링 시간 확보)
         setTimeout(() => {
             captureAndDownload();
-        }, 500);
+        }, 300);
     });
     
     function captureAndDownload() {
@@ -360,15 +385,30 @@ function downloadResult() {
                 imageTimeout: 30000, // 이미지 타임아웃 증가
                 letterRendering: true, // 텍스트 선명도 향상
                 onclone: function(clonedDoc, element) {
-                    // 클론된 문서의 이미지 경로를 절대 경로로 변환
+                    // 클론된 문서의 이미지를 data URL로 교체
                     const clonedImages = clonedDoc.querySelectorAll('img');
                     clonedImages.forEach((img, index) => {
-                        if (img.src && !img.src.startsWith('http') && !img.src.startsWith('data:')) {
+                        // 원본 이미지와 매칭하여 data URL 적용
+                        const originalImg = Array.from(images).find(orig => {
+                            const origSrc = orig.getAttribute('src');
+                            const clonedSrc = img.getAttribute('src');
+                            return origSrc === clonedSrc || orig.src === clonedSrc;
+                        });
+                        
+                        if (originalImg && imageDataUrls.has(originalImg)) {
+                            img.src = imageDataUrls.get(originalImg);
+                            console.log(`클론 이미지 ${index} data URL 적용`);
+                        } else if (img.src && !img.src.startsWith('data:')) {
+                            // data URL이 없으면 원본 이미지에서 가져오기
                             const imgPath = img.getAttribute('src');
-                            if (imgPath) {
-                                const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-                                img.src = baseUrl + imgPath;
-                                console.log(`클론 이미지 ${index} 경로 변환:`, img.src);
+                            if (imgPath && !imgPath.startsWith('data:')) {
+                                // 원본 이미지 찾기
+                                const matchingOriginal = Array.from(images).find(orig => {
+                                    return orig.getAttribute('src') === imgPath || orig.src.includes(imgPath);
+                                });
+                                if (matchingOriginal && imageDataUrls.has(matchingOriginal)) {
+                                    img.src = imageDataUrls.get(matchingOriginal);
+                                }
                             }
                         }
                         
@@ -376,15 +416,9 @@ function downloadResult() {
                         img.style.display = 'block';
                         img.style.visibility = 'visible';
                         img.style.opacity = '1';
-                        
-                        // 이미지가 로드되지 않았으면 대체 처리
-                        if (!img.complete || img.naturalHeight === 0) {
-                            console.warn(`클론 이미지 ${index} 로드 실패, 대체 처리`);
-                            const parent = img.parentElement;
-                            if (parent && parent.tagName === 'DIV') {
-                                parent.innerHTML = '<span style="color: #0284c7; font-weight: bold; font-size: 12px;">FLOW LAB</span>';
-                            }
-                        }
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'contain';
                     });
                     // 클론된 문서에서도 버튼 숨기기
                     const clonedButtons = clonedDoc.querySelectorAll('button');
@@ -415,19 +449,11 @@ function downloadResult() {
                         resultScreen.style.backgroundColor = '#ffffff';
                     }
                     
-                    // 로고 이미지가 잘 보이도록 스타일 강제 및 재로딩
+                    // 로고 이미지가 잘 보이도록 스타일 강제
                     const logoImages = clonedDoc.querySelectorAll('img[src*="fl_logo"]');
                     logoImages.forEach((img, index) => {
-                        // 이미지 경로를 절대 경로로 변환
-                        if (img.src && !img.src.startsWith('http') && !img.src.startsWith('data:')) {
-                            const imgPath = img.getAttribute('src');
-                            if (imgPath) {
-                                const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-                                img.src = baseUrl + imgPath;
-                            }
-                        }
-                        
-                        // 이미지 스타일 강제
+                        // data URL이 이미 적용되어 있어야 함 (위에서 처리됨)
+                        // 추가로 스타일 강제
                         img.style.width = '100%';
                         img.style.height = '100%';
                         img.style.maxWidth = '100%';
@@ -438,26 +464,6 @@ function downloadResult() {
                         img.style.opacity = '1';
                         img.style.borderRadius = '50%';
                         img.style.filter = 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))';
-                        
-                        // 이미지가 로드되지 않았으면 강제로 다시 로드
-                        if (!img.complete || img.naturalHeight === 0) {
-                            console.log(`로고 이미지 ${index} 재로딩 시도:`, img.src);
-                            const newImg = new Image();
-                            newImg.crossOrigin = 'anonymous';
-                            newImg.onload = () => {
-                                img.src = newImg.src;
-                                img.style.display = 'block';
-                                img.style.visibility = 'visible';
-                            };
-                            newImg.onerror = () => {
-                                console.warn(`로고 이미지 ${index} 로드 실패, 대체 텍스트 표시`);
-                                const parent = img.parentElement;
-                                if (parent && parent.tagName === 'DIV') {
-                                    parent.innerHTML = '<span style="color: #0284c7; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; height: 100%;">FLOW LAB</span>';
-                                }
-                            };
-                            newImg.src = img.src;
-                        }
                     });
                     
                     // 로고 컨테이너 스타일 강제 (테두리 제거, 그림자 효과)
