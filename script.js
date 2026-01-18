@@ -132,12 +132,14 @@ function showResult() {
     const secondaryResult = scoreData[1];
     const secondaryIndex = secondaryResult.index;
     
-    // 주기질 표시
-    document.getElementById('result-type').textContent = primaryResult.type.name;
+    // 주기질 표시 (영문 제거하여 더 짧게)
+    const primaryName = primaryResult.type.name.split('(')[0].trim();
+    document.getElementById('result-type').textContent = primaryName;
     document.getElementById('result-desc').textContent = primaryResult.type.desc;
     
-    // 보조기질 표시
-    document.getElementById('sub-result-type').textContent = secondaryResult.type.name;
+    // 보조기질 표시 (영문 제거하여 더 짧게)
+    const secondaryName = secondaryResult.type.name.split('(')[0].trim();
+    document.getElementById('sub-result-type').textContent = secondaryName;
     document.getElementById('sub-result-desc').textContent = secondaryResult.type.desc;
     
     // Render details - Sort by score (descending) for better visibility
@@ -171,25 +173,25 @@ function showResult() {
         }
         
         const row = document.createElement('div');
-        row.className = `p-2 rounded-lg border transition-all ${bgClass} ${borderClass}`;
+        row.className = `p-1.5 rounded-lg border transition-all ${bgClass} ${borderClass}`;
         
         row.innerHTML = `
-            <div class="flex items-center justify-between mb-1">
-                <div class="flex items-center gap-1.5 flex-1 min-w-0">
-                    <span class="text-xs font-bold ${rankClass} whitespace-nowrap">
+            <div class="flex items-center justify-between mb-0.5">
+                <div class="flex items-center gap-1 flex-1 min-w-0">
+                    <span class="text-[10px] font-bold ${rankClass} whitespace-nowrap">
                         ${displayIdx + 1}위
                     </span>
-                    <span class="text-xs font-semibold ${textClass} truncate">
+                    <span class="text-[10px] font-semibold ${textClass} truncate break-words">
                         ${type.name.split('(')[0].trim()}
                     </span>
                 </div>
-                <div class="text-right ml-2">
-                    <div class="text-sm font-bold ${textClass}">
+                <div class="text-right ml-1.5">
+                    <div class="text-xs font-bold ${textClass}">
                         ${score}점
                     </div>
                 </div>
             </div>
-            <div class="h-1.5 w-full bg-white rounded-full overflow-hidden">
+            <div class="h-1 w-full bg-white rounded-full overflow-hidden">
                 <div class="h-full ${barClass} transition-all duration-500" 
                      style="width: ${percent}%"></div>
             </div>
@@ -353,12 +355,29 @@ function downloadResult() {
                     // 로고 이미지가 잘 보이도록 스타일 강제
                     const logoImages = clonedDoc.querySelectorAll('img[src*="fl_logo"]');
                     logoImages.forEach(img => {
-                        img.style.width = '56px';
-                        img.style.height = '56px';
-                        img.style.minWidth = '56px';
-                        img.style.minHeight = '56px';
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.maxWidth = '100%';
+                        img.style.maxHeight = '100%';
                         img.style.objectFit = 'contain';
                         img.style.display = 'block';
+                        // 이미지 로드 실패 시 대체 텍스트 표시
+                        if (!img.complete || img.naturalHeight === 0) {
+                            const parent = img.parentElement;
+                            if (parent && parent.tagName === 'DIV') {
+                                parent.innerHTML = '<span class="text-brand-600 font-bold text-xs">FLOW LAB</span>';
+                            }
+                        }
+                    });
+                    
+                    // 로고 컨테이너 스타일 강제
+                    const logoContainers = clonedDoc.querySelectorAll('div:has(img[src*="fl_logo"])');
+                    logoContainers.forEach(container => {
+                        container.style.width = '64px';
+                        container.style.height = '64px';
+                        container.style.display = 'flex';
+                        container.style.alignItems = 'center';
+                        container.style.justifyContent = 'center';
                     });
                     
                     // 텍스트 색상을 더 진하게 강제 (가독성 향상)
