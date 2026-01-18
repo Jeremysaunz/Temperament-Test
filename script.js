@@ -292,24 +292,50 @@ function downloadResult() {
     
     function captureAndDownload() {
         try {
-            // html2canvas로 캡처
+            // blur 효과를 임시로 제거하여 선명도 향상
+            const blurElements = resultContent.querySelectorAll('[class*="blur"]');
+            const originalBlurStyles = [];
+            blurElements.forEach(el => {
+                originalBlurStyles.push({
+                    element: el,
+                    filter: el.style.filter,
+                    backdropFilter: el.style.backdropFilter
+                });
+                el.style.filter = 'none';
+                el.style.backdropFilter = 'none';
+            });
+            
+            // html2canvas로 캡처 (고해상도)
             html2canvas(resultContent, {
                 backgroundColor: '#f8fafc',
-                scale: 2,
+                scale: 3, // 해상도 3배로 증가 (더 선명하게)
                 useCORS: true,
-                logging: true, // 디버깅을 위해 활성화
+                logging: false,
                 allowTaint: false,
-                foreignObjectRendering: false,
+                foreignObjectRendering: true, // 텍스트 렌더링 개선
                 removeContainer: false,
                 imageTimeout: 20000,
+                letterRendering: true, // 텍스트 선명도 향상
                 onclone: function(clonedDoc, element) {
                     // 클론된 문서에서도 버튼 숨기기
                     const clonedButtons = clonedDoc.querySelectorAll('button');
                     clonedButtons.forEach(btn => {
                         btn.style.display = 'none';
                     });
+                    
+                    // 클론된 문서에서도 blur 제거
+                    const clonedBlurElements = clonedDoc.querySelectorAll('[class*="blur"]');
+                    clonedBlurElements.forEach(el => {
+                        el.style.filter = 'none';
+                        el.style.backdropFilter = 'none';
+                    });
                 }
             }).then(canvas => {
+                // blur 효과 복원
+                originalBlurStyles.forEach(state => {
+                    state.element.style.filter = state.filter;
+                    state.element.style.backdropFilter = state.backdropFilter;
+                });
                 // 원본 요소 복원
                 if (wasHidden) {
                     resultContent.classList.add('hidden');
@@ -367,21 +393,21 @@ function downloadResult() {
                     }
                 };
                 
-                // Blob 방식 시도
+                // Blob 방식 시도 (최고 품질)
                 if (canvas.toBlob) {
                     canvas.toBlob(function(blob) {
                         if (blob) {
                             const url = URL.createObjectURL(blob);
                             downloadImage(url);
                         } else {
-                            // Blob 실패 시 data URL 사용
-                            const dataUrl = canvas.toDataURL('image/png');
+                            // Blob 실패 시 data URL 사용 (최고 품질)
+                            const dataUrl = canvas.toDataURL('image/png', 1.0);
                             downloadImage(dataUrl);
                         }
-                    }, 'image/png', 0.95);
+                    }, 'image/png', 1.0); // 최고 품질 (1.0)
                 } else {
-                    // toBlob이 없는 경우 data URL 사용
-                    const dataUrl = canvas.toDataURL('image/png');
+                    // toBlob이 없는 경우 data URL 사용 (최고 품질)
+                    const dataUrl = canvas.toDataURL('image/png', 1.0);
                     downloadImage(dataUrl);
                 }
             }).catch(err => {
