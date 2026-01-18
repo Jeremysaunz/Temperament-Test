@@ -350,6 +350,17 @@ function downloadResult() {
                         resultScreen.style.backgroundColor = '#ffffff';
                     }
                     
+                    // 로고 이미지가 잘 보이도록 스타일 강제
+                    const logoImages = clonedDoc.querySelectorAll('img[src*="fl_logo"]');
+                    logoImages.forEach(img => {
+                        img.style.width = '56px';
+                        img.style.height = '56px';
+                        img.style.minWidth = '56px';
+                        img.style.minHeight = '56px';
+                        img.style.objectFit = 'contain';
+                        img.style.display = 'block';
+                    });
+                    
                     // 텍스트 색상을 더 진하게 강제 (가독성 향상)
                     const textElements = clonedDoc.querySelectorAll('h2, h3, p, span, div');
                     textElements.forEach(el => {
