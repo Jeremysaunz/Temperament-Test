@@ -173,25 +173,25 @@ function showResult() {
         }
         
         const row = document.createElement('div');
-        row.className = `p-1.5 rounded-lg border transition-all ${bgClass} ${borderClass}`;
+        row.className = `p-2 rounded-lg border transition-all ${bgClass} ${borderClass}`;
         
         row.innerHTML = `
-            <div class="flex items-center justify-between mb-0.5">
-                <div class="flex items-center gap-1 flex-1 min-w-0">
-                    <span class="text-[10px] font-bold ${rankClass} whitespace-nowrap">
+            <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-1.5 flex-1 min-w-0">
+                    <span class="text-xs font-bold ${rankClass} whitespace-nowrap">
                         ${displayIdx + 1}위
                     </span>
-                    <span class="text-[10px] font-semibold ${textClass} truncate break-words">
+                    <span class="text-xs font-semibold ${textClass} truncate break-words">
                         ${type.name.split('(')[0].trim()}
                     </span>
                 </div>
-                <div class="text-right ml-1.5">
-                    <div class="text-xs font-bold ${textClass}">
+                <div class="text-right ml-2">
+                    <div class="text-sm font-bold ${textClass}">
                         ${score}점
                     </div>
                 </div>
             </div>
-            <div class="h-1 w-full bg-white rounded-full overflow-hidden">
+            <div class="h-1.5 w-full bg-white rounded-full overflow-hidden">
                 <div class="h-full ${barClass} transition-all duration-500" 
                      style="width: ${percent}%"></div>
             </div>
