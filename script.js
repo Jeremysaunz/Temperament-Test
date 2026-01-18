@@ -361,6 +361,8 @@ function downloadResult() {
                         img.style.maxHeight = '100%';
                         img.style.objectFit = 'contain';
                         img.style.display = 'block';
+                        img.style.borderRadius = '50%';
+                        img.style.filter = 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))';
                         // 이미지 로드 실패 시 대체 텍스트 표시
                         if (!img.complete || img.naturalHeight === 0) {
                             const parent = img.parentElement;
@@ -370,14 +372,21 @@ function downloadResult() {
                         }
                     });
                     
-                    // 로고 컨테이너 스타일 강제
-                    const logoContainers = clonedDoc.querySelectorAll('div:has(img[src*="fl_logo"])');
-                    logoContainers.forEach(container => {
-                        container.style.width = '64px';
-                        container.style.height = '64px';
-                        container.style.display = 'flex';
-                        container.style.alignItems = 'center';
-                        container.style.justifyContent = 'center';
+                    // 로고 컨테이너 스타일 강제 (테두리 제거, 그림자 효과)
+                    logoImages.forEach(img => {
+                        const container = img.parentElement;
+                        if (container && container.tagName === 'DIV') {
+                            container.style.width = '64px';
+                            container.style.height = '64px';
+                            container.style.display = 'flex';
+                            container.style.alignItems = 'center';
+                            container.style.justifyContent = 'center';
+                            container.style.border = 'none';
+                            container.style.borderRadius = '50%';
+                            container.style.background = 'linear-gradient(to bottom right, #f0f9ff, #ffffff)';
+                            container.style.boxShadow = '0 10px 25px -5px rgba(14, 165, 233, 0.2), 0 4px 6px -2px rgba(14, 165, 233, 0.1)';
+                            container.style.padding = '4px';
+                        }
                     });
                     
                     // 텍스트 색상을 더 진하게 강제 (가독성 향상)
