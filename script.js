@@ -318,17 +318,20 @@ function downloadResult() {
     const originalStyle = resultContent.style.cssText;
     const originalBackground = resultContent.style.background;
     const originalBackgroundColor = resultContent.style.backgroundColor;
+    const originalPaddingTop = resultContent.style.paddingTop;
     
-            // 원본 요소를 보이게 만들기 (캡처를 위해)
-            resultContent.classList.remove('hidden');
-            resultContent.style.position = 'fixed';
-            resultContent.style.left = '0';
-            resultContent.style.top = '20px'; // 상단 여백 추가
-            resultContent.style.zIndex = '9999';
-            resultContent.style.width = resultContent.offsetWidth + 'px';
-            resultContent.style.background = '#ffffff'; // 흰색 배경 강제
-            resultContent.style.backgroundColor = '#ffffff';
-            resultContent.style.paddingTop = '24px'; // 상단 패딩 추가
+    // 원본 요소를 보이게 만들기 (캡처를 위해)
+    resultContent.classList.remove('hidden');
+    resultContent.style.position = 'fixed';
+    resultContent.style.left = '50%';
+    resultContent.style.top = '40px'; // 충분한 상단 여백
+    resultContent.style.transform = 'translateX(-50%)';
+    resultContent.style.zIndex = '9999';
+    resultContent.style.width = resultContent.offsetWidth + 'px';
+    resultContent.style.background = '#ffffff'; // 흰색 배경 강제
+    resultContent.style.backgroundColor = '#ffffff';
+    resultContent.style.paddingTop = '40px'; // 충분한 상단 패딩
+    resultContent.style.marginTop = '0';
     
     // 버튼들을 임시로 숨기기
     const buttons = resultContent.querySelectorAll('button');
@@ -451,27 +454,54 @@ function downloadResult() {
                 el.style.backdropFilter = 'none';
             });
             
+            // 상단 여백을 위한 래퍼 컨테이너 생성
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.left = '-9999px';
+            wrapper.style.top = '0';
+            wrapper.style.width = resultContent.offsetWidth + 'px';
+            wrapper.style.backgroundColor = '#ffffff';
+            wrapper.style.paddingTop = '60px'; // 충분한 상단 여백
+            wrapper.style.paddingBottom = '40px'; // 하단 여백
+            wrapper.style.paddingLeft = '0';
+            wrapper.style.paddingRight = '0';
+            
+            // 원본 요소 복제
+            const clonedContent = resultContent.cloneNode(true);
+            clonedContent.id = 'result-screen-clone';
+            clonedContent.classList.remove('hidden');
+            clonedContent.style.position = 'relative';
+            clonedContent.style.margin = '0';
+            clonedContent.style.paddingTop = '0'; // 래퍼의 패딩 사용
+            
+            wrapper.appendChild(clonedContent);
+            document.body.appendChild(wrapper);
+            
             // html2canvas로 캡처 (고해상도)
-            html2canvas(resultContent, {
+            html2canvas(wrapper, {
                 backgroundColor: '#ffffff', // 순수 흰색 배경으로 변경
                 scale: 3, // 해상도 3배로 증가 (더 선명하게)
                 useCORS: true,
                 logging: false, // 디버깅 비활성화
                 allowTaint: true, // 이미지 로딩을 위해 true로 변경
                 foreignObjectRendering: true, // 텍스트 렌더링 개선
-                removeContainer: false,
+                removeContainer: true,
                 imageTimeout: 30000, // 이미지 타임아웃 증가
                 letterRendering: true, // 텍스트 선명도 향상
-                x: 0,
-                y: 0,
-                windowWidth: resultContent.scrollWidth,
-                windowHeight: resultContent.scrollHeight + 40, // 상단 여백을 위해 높이 추가
+                width: wrapper.offsetWidth,
+                height: wrapper.offsetHeight,
                 onclone: function(clonedDoc, element) {
                     // 클론된 요소에 상단 여백 추가
-                    const clonedResult = clonedDoc.getElementById('result-screen');
+                    const clonedResult = clonedDoc.getElementById('result-screen-clone');
                     if (clonedResult) {
-                        clonedResult.style.paddingTop = '24px';
-                        clonedResult.style.marginTop = '20px';
+                        clonedResult.style.paddingTop = '0';
+                        clonedResult.style.marginTop = '0';
+                    }
+                    // 래퍼의 패딩 확인
+                    const clonedWrapper = element;
+                    if (clonedWrapper) {
+                        clonedWrapper.style.paddingTop = '60px';
+                        clonedWrapper.style.paddingBottom = '40px';
                     }
                     // 클론된 문서의 이미지를 data URL로 교체
                     const clonedImages = clonedDoc.querySelectorAll('img');
@@ -603,6 +633,11 @@ function downloadResult() {
                     });
                 }
             }).then(canvas => {
+                // 래퍼 제거
+                if (wrapper && wrapper.parentNode) {
+                    document.body.removeChild(wrapper);
+                }
+                
                 // blur 효과 복원
                 originalBlurStyles.forEach(state => {
                     state.element.style.filter = state.filter;
@@ -615,6 +650,10 @@ function downloadResult() {
                 resultContent.style.cssText = originalStyle;
                 resultContent.style.background = originalBackground;
                 resultContent.style.backgroundColor = originalBackgroundColor;
+                resultContent.style.paddingTop = originalPaddingTop;
+                resultContent.style.transform = '';
+                resultContent.style.left = '';
+                resultContent.style.top = '';
                 
                 // 버튼 복원
                 buttonStates.forEach(state => {
@@ -700,6 +739,10 @@ function downloadResult() {
                 resultContent.style.cssText = originalStyle;
                 resultContent.style.background = originalBackground;
                 resultContent.style.backgroundColor = originalBackgroundColor;
+                resultContent.style.paddingTop = originalPaddingTop;
+                resultContent.style.transform = '';
+                resultContent.style.left = '';
+                resultContent.style.top = '';
                 
                 // 버튼 복원
                 buttonStates.forEach(state => {
@@ -713,6 +756,12 @@ function downloadResult() {
                 downloadBtn.disabled = false;
             });
         } catch (err) {
+            // 래퍼 제거 (에러 발생 시)
+            const existingWrapper = document.querySelector('div[style*="left: -9999px"]');
+            if (existingWrapper && existingWrapper.parentNode) {
+                document.body.removeChild(existingWrapper);
+            }
+            
             // blur 효과 복원
             originalBlurStyles.forEach(state => {
                 state.element.style.filter = state.filter;
@@ -728,6 +777,10 @@ function downloadResult() {
             resultContent.style.cssText = originalStyle;
             resultContent.style.background = originalBackground;
             resultContent.style.backgroundColor = originalBackgroundColor;
+            resultContent.style.paddingTop = originalPaddingTop;
+            resultContent.style.transform = '';
+            resultContent.style.left = '';
+            resultContent.style.top = '';
             
             // 버튼 복원
             buttonStates.forEach(state => {
