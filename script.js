@@ -50,6 +50,7 @@ const types = [
 
 let currentQuestionIndex = 0;
 let scores = [0, 0, 0, 0]; // Index 0: 표현형, 1: 추진형, 2: 성찰형, 3: 안정형
+let answers = []; // 사용자가 선택한 답변 저장
 
 const startScreen = document.getElementById('start-screen');
 const quizScreen = document.getElementById('quiz-screen');
@@ -88,19 +89,37 @@ function renderQuestion() {
     const grid = document.createElement('div');
     grid.className = 'grid grid-cols-1 gap-3';
     
+    // 이전에 선택한 답변이 있는지 확인
+    const previousAnswer = answers[currentQuestionIndex];
+    
     question.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
-        btn.className = 'option-btn w-full text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-purple-300 hover:bg-purple-50 text-slate-700 font-medium transition-all shadow-sm hover:shadow-md';
-        btn.innerHTML = `<span class="inline-block w-7 h-7 rounded-full bg-purple-500 text-white text-xs flex items-center justify-center mr-3 font-bold">${idx + 1}</span><span class="text-sm">${opt}</span>`;
+        const isSelected = previousAnswer === idx;
+        btn.className = `option-btn w-full text-left p-4 rounded-xl border-2 transition-all shadow-sm hover:shadow-md ${
+            isSelected 
+                ? 'border-purple-500 bg-purple-100 hover:bg-purple-100' 
+                : 'border-slate-200 bg-white hover:border-purple-300 hover:bg-purple-50'
+        } text-slate-700 font-medium`;
+        btn.innerHTML = `<span class="inline-block w-7 h-7 rounded-full ${
+            isSelected ? 'bg-purple-600' : 'bg-purple-500'
+        } text-white text-xs flex items-center justify-center mr-3 font-bold">${idx + 1}</span><span class="text-sm">${opt}</span>`;
         
         btn.onclick = () => handleAnswer(idx);
         grid.appendChild(btn);
     });
     
     questionContainer.appendChild(grid);
+    updatePrevButton();
 }
 
 function handleAnswer(selectedIndex) {
+    // 이전 답변의 점수 제거 (답변 변경 시)
+    if (answers[currentQuestionIndex] !== undefined) {
+        scores[answers[currentQuestionIndex]]--;
+    }
+    
+    // 새 답변 저장 및 점수 추가
+    answers[currentQuestionIndex] = selectedIndex;
     scores[selectedIndex]++;
     
     if (currentQuestionIndex < questions.length - 1) {
@@ -109,6 +128,26 @@ function handleAnswer(selectedIndex) {
         setTimeout(renderQuestion, 200);
     } else {
         showResult();
+    }
+}
+
+function goToPreviousQuestion() {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion();
+    }
+}
+
+function updatePrevButton() {
+    const prevButton = document.getElementById('prev-button');
+    if (prevButton) {
+        if (currentQuestionIndex === 0) {
+            prevButton.disabled = true;
+            prevButton.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            prevButton.disabled = false;
+            prevButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
     }
 }
 
@@ -282,577 +321,3 @@ function restartTest() {
     startTest();
 }
 
-function downloadResult() {
-    // Get the download button
-    const downloadBtn = event?.target?.closest('button') || document.querySelector('button[onclick*="downloadResult"]');
-    if (!downloadBtn) {
-        console.error('다운로드 버튼을 찾을 수 없습니다.');
-        alert('다운로드 버튼을 찾을 수 없습니다.');
-        return;
-    }
-    
-    const originalHTML = downloadBtn.innerHTML;
-    downloadBtn.innerHTML = '<span class="animate-pulse">저장 중...</span>';
-    downloadBtn.disabled = true;
-    
-    // Get the result screen element
-    const resultContent = document.getElementById('result-screen');
-    if (!resultContent) {
-        console.error('결과 화면을 찾을 수 없습니다.');
-        downloadBtn.innerHTML = originalHTML;
-        downloadBtn.disabled = false;
-        alert('결과 화면을 찾을 수 없습니다.');
-        return;
-    }
-    
-    // Check if html2canvas is loaded
-    if (typeof html2canvas === 'undefined') {
-        alert('이미지 변환 라이브러리를 불러올 수 없습니다. 페이지를 새로고침해주세요.');
-        downloadBtn.innerHTML = originalHTML;
-        downloadBtn.disabled = false;
-        return;
-    }
-    
-    // 원본 요소의 상태 저장
-    const wasHidden = resultContent.classList.contains('hidden');
-    const originalStyle = resultContent.style.cssText;
-    const originalBackground = resultContent.style.background;
-    const originalBackgroundColor = resultContent.style.backgroundColor;
-    const originalPaddingTop = resultContent.style.paddingTop;
-    
-    // 원본 요소를 보이게 만들기 (캡처를 위해)
-    resultContent.classList.remove('hidden');
-    resultContent.style.position = 'fixed';
-    resultContent.style.left = '50%';
-    resultContent.style.top = '40px'; // 충분한 상단 여백
-    resultContent.style.transform = 'translateX(-50%)';
-    resultContent.style.zIndex = '9999';
-    resultContent.style.width = resultContent.offsetWidth + 'px';
-    resultContent.style.background = '#ffffff'; // 흰색 배경 강제
-    resultContent.style.backgroundColor = '#ffffff';
-    resultContent.style.paddingTop = '40px'; // 충분한 상단 패딩
-    resultContent.style.marginTop = '0';
-    
-    // 버튼들을 임시로 숨기기
-    const buttons = resultContent.querySelectorAll('button');
-    const buttonStates = [];
-    buttons.forEach(btn => {
-        buttonStates.push({
-            element: btn,
-            display: btn.style.display
-        });
-        btn.style.display = 'none';
-    });
-    
-    // 이미지를 base64로 변환하여 로드 보장
-    const images = resultContent.querySelectorAll('img');
-    const imageDataUrls = new Map();
-    
-    // 모든 이미지를 base64로 변환
-    const imagePromises = Array.from(images).map((img, index) => {
-        return new Promise((resolve) => {
-            const imgPath = img.getAttribute('src');
-            if (!imgPath) {
-                resolve();
-                return;
-            }
-            
-            // 이미 data URL이면 그대로 사용
-            if (imgPath.startsWith('data:')) {
-                imageDataUrls.set(img, imgPath);
-                resolve();
-                return;
-            }
-            
-            // 이미지 경로를 절대 경로로 변환
-            let absolutePath = imgPath;
-            if (!imgPath.startsWith('http') && !imgPath.startsWith('data:')) {
-                const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-                absolutePath = baseUrl + imgPath;
-            }
-            
-            // 이미지가 이미 로드되어 있으면 바로 변환
-            if (img.complete && img.naturalHeight !== 0 && img.naturalWidth !== 0) {
-                try {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.naturalWidth;
-                    canvas.height = img.naturalHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    const dataUrl = canvas.toDataURL('image/png');
-                    imageDataUrls.set(img, dataUrl);
-                    console.log(`이미지 ${index} base64 변환 완료 (기존 로드)`);
-                    resolve();
-                } catch (e) {
-                    console.warn(`이미지 ${index} base64 변환 실패:`, e);
-                    // 새로 로드 시도
-                    loadImageAsBase64(absolutePath, img, index, resolve);
-                }
-            } else {
-                // 새로 로드
-                loadImageAsBase64(absolutePath, img, index, resolve);
-            }
-        });
-    });
-    
-    // 이미지를 base64로 로드하는 헬퍼 함수
-    function loadImageAsBase64(url, originalImg, index, resolve) {
-        const newImg = new Image();
-        newImg.crossOrigin = 'anonymous';
-        
-        newImg.onload = () => {
-            try {
-                const canvas = document.createElement('canvas');
-                canvas.width = newImg.naturalWidth;
-                canvas.height = newImg.naturalHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(newImg, 0, 0);
-                const dataUrl = canvas.toDataURL('image/png');
-                imageDataUrls.set(originalImg, dataUrl);
-                console.log(`이미지 ${index} base64 변환 완료:`, url);
-                resolve();
-            } catch (e) {
-                console.error(`이미지 ${index} base64 변환 오류:`, e);
-                resolve(); // 에러가 나도 계속 진행
-            }
-        };
-        
-        newImg.onerror = () => {
-            console.warn(`이미지 ${index} 로드 실패:`, url);
-            resolve(); // 에러가 나도 계속 진행
-        };
-        
-        newImg.src = url;
-    }
-    
-    // 모든 이미지 로딩 대기
-    Promise.all(imagePromises).then(() => {
-        // base64로 변환된 이미지들을 원본 이미지 src에 적용
-        imageDataUrls.forEach((dataUrl, img) => {
-            img.src = dataUrl;
-            console.log('이미지 src를 data URL로 교체');
-        });
-        
-        // 약간의 추가 대기 후 캡처 (이미지 렌더링 시간 확보)
-        setTimeout(() => {
-            captureAndDownload();
-        }, 300);
-    });
-    
-    function captureAndDownload() {
-        try {
-            // blur 효과를 임시로 제거하여 선명도 향상
-            const blurElements = resultContent.querySelectorAll('[class*="blur"]');
-            const originalBlurStyles = [];
-            blurElements.forEach(el => {
-                originalBlurStyles.push({
-                    element: el,
-                    filter: el.style.filter,
-                    backdropFilter: el.style.backdropFilter
-                });
-                el.style.filter = 'none';
-                el.style.backdropFilter = 'none';
-            });
-            
-            // 상단 여백을 위한 래퍼 컨테이너 생성
-            const wrapper = document.createElement('div');
-            wrapper.style.position = 'fixed';
-            wrapper.style.left = '0';
-            wrapper.style.top = '0';
-            wrapper.style.width = resultContent.offsetWidth + 'px';
-            wrapper.style.backgroundColor = '#ffffff';
-            wrapper.style.paddingTop = '120px'; // 충분한 상단 여백
-            wrapper.style.paddingBottom = '60px'; // 하단 여백
-            wrapper.style.paddingLeft = '0';
-            wrapper.style.paddingRight = '0';
-            wrapper.style.boxSizing = 'border-box';
-            wrapper.style.display = 'block';
-            wrapper.style.visibility = 'hidden'; // 보이지 않게 하지만 렌더링은 됨
-            wrapper.style.opacity = '0';
-            wrapper.style.pointerEvents = 'none';
-            wrapper.style.zIndex = '-1';
-            
-            // 원본 요소 복제
-            const clonedContent = resultContent.cloneNode(true);
-            clonedContent.id = 'result-screen-clone';
-            clonedContent.classList.remove('hidden');
-            clonedContent.style.position = 'relative';
-            clonedContent.style.margin = '0';
-            clonedContent.style.paddingTop = '0'; // 래퍼의 패딩 사용
-            clonedContent.style.width = '100%';
-            clonedContent.style.boxSizing = 'border-box';
-            
-            wrapper.appendChild(clonedContent);
-            document.body.appendChild(wrapper);
-            
-            // 래퍼의 실제 높이 계산 (콘텐츠 + 패딩)
-            const wrapperHeight = clonedContent.scrollHeight + 120 + 60; // 콘텐츠 높이 + 상단 패딩(120px) + 하단 패딩(60px)
-            wrapper.style.height = wrapperHeight + 'px';
-            
-            // 약간의 대기 시간을 두어 렌더링 완료 보장 후 캡처 (Promise로 감싸기)
-            const capturePromise = new Promise((resolve) => {
-                setTimeout(() => {
-                    // html2canvas로 캡처 (고해상도)
-                    html2canvas(wrapper, {
-                        backgroundColor: '#ffffff', // 순수 흰색 배경으로 변경
-                        scale: 3, // 해상도 3배로 증가 (더 선명하게)
-                        useCORS: true,
-                        logging: false, // 디버깅 비활성화
-                        allowTaint: true, // 이미지 로딩을 위해 true로 변경
-                        foreignObjectRendering: true, // 텍스트 렌더링 개선
-                        removeContainer: true,
-                        imageTimeout: 30000, // 이미지 타임아웃 증가
-                        letterRendering: true, // 텍스트 선명도 향상
-                        width: wrapper.offsetWidth,
-                        height: wrapperHeight,
-                        onclone: function(clonedDoc, element) {
-                            // 클론된 요소에 상단 여백 추가
-                            const clonedResult = clonedDoc.getElementById('result-screen-clone');
-                            if (clonedResult) {
-                                clonedResult.style.paddingTop = '0';
-                                clonedResult.style.marginTop = '0';
-                            }
-                            // 래퍼의 패딩 확인 및 강제 설정
-                            const clonedWrapper = element;
-                            if (clonedWrapper) {
-                                clonedWrapper.style.paddingTop = '120px';
-                                clonedWrapper.style.paddingBottom = '60px';
-                                clonedWrapper.style.backgroundColor = '#ffffff';
-                                clonedWrapper.style.boxSizing = 'border-box';
-                                clonedWrapper.style.display = 'block';
-                                clonedWrapper.style.width = resultContent.offsetWidth + 'px';
-                                const clonedResultScreen = clonedDoc.getElementById('result-screen-clone');
-                                if (clonedResultScreen) {
-                                    clonedWrapper.style.height = (clonedResultScreen.scrollHeight + 120 + 60) + 'px';
-                                }
-                            }
-                            // 클론된 문서의 이미지를 data URL로 교체
-                            const clonedImages = clonedDoc.querySelectorAll('img');
-                    clonedImages.forEach((img, index) => {
-                        // 원본 이미지와 매칭하여 data URL 적용
-                        const originalImg = Array.from(images).find(orig => {
-                            const origSrc = orig.getAttribute('src');
-                            const clonedSrc = img.getAttribute('src');
-                            return origSrc === clonedSrc || orig.src === clonedSrc;
-                        });
-                        
-                        if (originalImg && imageDataUrls.has(originalImg)) {
-                            img.src = imageDataUrls.get(originalImg);
-                            console.log(`클론 이미지 ${index} data URL 적용`);
-                        } else if (img.src && !img.src.startsWith('data:')) {
-                            // data URL이 없으면 원본 이미지에서 가져오기
-                            const imgPath = img.getAttribute('src');
-                            if (imgPath && !imgPath.startsWith('data:')) {
-                                // 원본 이미지 찾기
-                                const matchingOriginal = Array.from(images).find(orig => {
-                                    return orig.getAttribute('src') === imgPath || orig.src.includes(imgPath);
-                                });
-                                if (matchingOriginal && imageDataUrls.has(matchingOriginal)) {
-                                    img.src = imageDataUrls.get(matchingOriginal);
-                                }
-                            }
-                        }
-                        
-                        // 이미지 스타일 강제
-                        img.style.display = 'block';
-                        img.style.visibility = 'visible';
-                        img.style.opacity = '1';
-                        img.style.width = '100%';
-                        img.style.height = '100%';
-                        img.style.objectFit = 'contain';
-                            });
-                            // 클론된 문서에서도 버튼 숨기기
-                            const clonedButtons = clonedDoc.querySelectorAll('button');
-                            clonedButtons.forEach(btn => {
-                                btn.style.display = 'none';
-                            });
-                            
-                            // 클론된 문서에서도 blur 제거
-                            const clonedBlurElements = clonedDoc.querySelectorAll('[class*="blur"]');
-                            clonedBlurElements.forEach(el => {
-                                el.style.filter = 'none';
-                                el.style.backdropFilter = 'none';
-                                el.style.opacity = '1'; // 투명도 제거
-                            });
-                            
-                            // glass-panel 효과 제거 (더 선명하게)
-                            const glassPanels = clonedDoc.querySelectorAll('.glass-panel');
-                            glassPanels.forEach(panel => {
-                                panel.style.background = '#ffffff';
-                                panel.style.backdropFilter = 'none';
-                                panel.style.webkitBackdropFilter = 'none';
-                            });
-                            
-                            // 배경을 흰색으로 강제
-                            const resultScreen = clonedDoc.getElementById('result-screen');
-                            const clonedResultScreen = clonedDoc.getElementById('result-screen-clone');
-                            if (resultScreen) {
-                                resultScreen.style.background = '#ffffff';
-                                resultScreen.style.backgroundColor = '#ffffff';
-                            }
-                            if (clonedResultScreen) {
-                                clonedResultScreen.style.background = '#ffffff';
-                                clonedResultScreen.style.backgroundColor = '#ffffff';
-                            }
-                            
-                            // FLOWLAB 텍스트 스타일 강제
-                            const flowlabText = clonedDoc.querySelector('.flowlab-text');
-                            if (flowlabText) {
-                                flowlabText.style.color = '#ffffff';
-                                flowlabText.style.fontWeight = '700';
-                                flowlabText.style.letterSpacing = '0.15em';
-                                flowlabText.style.textTransform = 'uppercase';
-                                flowlabText.style.textShadow = '0 1px 2px rgba(0, 0, 0, 0.1)';
-                            }
-                            const flowlabContainer = flowlabText?.parentElement?.parentElement;
-                            if (flowlabContainer) {
-                                const flowlabInner = flowlabText?.parentElement;
-                                if (flowlabInner) {
-                                    flowlabInner.style.background = 'linear-gradient(to bottom right, #0ea5e9, #0284c7)';
-                                    flowlabInner.style.borderRadius = '9999px';
-                                    flowlabInner.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
-                                    flowlabInner.style.padding = '10px 20px';
-                                }
-                            }
-                            
-                            // 로고 이미지가 잘 보이도록 스타일 강제
-                            const logoImages = clonedDoc.querySelectorAll('img[src*="fl_logo"]');
-                            logoImages.forEach((img, index) => {
-                                // data URL이 이미 적용되어 있어야 함 (위에서 처리됨)
-                                // 추가로 스타일 강제
-                                img.style.width = '100%';
-                                img.style.height = '100%';
-                                img.style.maxWidth = '100%';
-                                img.style.maxHeight = '100%';
-                                img.style.objectFit = 'contain';
-                                img.style.display = 'block';
-                                img.style.visibility = 'visible';
-                                img.style.opacity = '1';
-                                img.style.borderRadius = '50%';
-                                img.style.filter = 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))';
-                            });
-                            
-                            // 로고 컨테이너 스타일 강제 (테두리 제거, 그림자 효과)
-                            logoImages.forEach(img => {
-                                const container = img.parentElement;
-                                if (container && container.tagName === 'DIV') {
-                                    container.style.width = '64px';
-                                    container.style.height = '64px';
-                                    container.style.display = 'flex';
-                                    container.style.alignItems = 'center';
-                                    container.style.justifyContent = 'center';
-                                    container.style.border = 'none';
-                                    container.style.borderRadius = '50%';
-                                    container.style.background = 'linear-gradient(to bottom right, #f0f9ff, #ffffff)';
-                                    container.style.boxShadow = '0 10px 25px -5px rgba(14, 165, 233, 0.2), 0 4px 6px -2px rgba(14, 165, 233, 0.1)';
-                                    container.style.padding = '4px';
-                                    container.style.visibility = 'visible';
-                                    container.style.opacity = '1';
-                                }
-                            });
-                            
-                            // 텍스트 색상을 더 진하게 강제 (가독성 향상)
-                            const textElements = clonedDoc.querySelectorAll('h2, h3, p, span, div');
-                            textElements.forEach(el => {
-                                const computedStyle = window.getComputedStyle(el);
-                                const color = computedStyle.color;
-                                
-                                // 회색 계열 텍스트를 더 진하게
-                                if (color.includes('rgb(148, 163, 184)') || // slate-400
-                                    color.includes('rgb(100, 116, 139)') || // slate-500
-                                    color.includes('rgb(71, 85, 105)')) {   // slate-600
-                                    el.style.color = '#1e293b'; // slate-800로 강제
-                                }
-                                
-                                // slate-700도 더 진하게
-                                if (color.includes('rgb(51, 65, 85)')) { // slate-700
-                                    el.style.color = '#0f172a'; // slate-900로 강제
-                                }
-                            });
-                            
-                            // 배경이 투명하거나 반투명한 요소들을 흰색으로
-                            const bgElements = clonedDoc.querySelectorAll('[class*="bg-white"], [class*="bg-slate"]');
-                            bgElements.forEach(el => {
-                                const computedStyle = window.getComputedStyle(el);
-                                const bgColor = computedStyle.backgroundColor;
-                                if (bgColor.includes('rgba') && bgColor.includes('0.') || bgColor === 'transparent') {
-                                    el.style.backgroundColor = '#ffffff';
-                                }
-                            });
-                }
-                }).then(canvas => {
-                    resolve(canvas);
-                }).catch(err => {
-                    resolve(null); // 에러 발생 시 null 반환
-                });
-            }, 100);
-            });
-            
-            capturePromise.then(canvas => {
-                if (!canvas) {
-                    throw new Error('캔버스 생성 실패');
-                }
-                // 래퍼 제거
-                if (wrapper && wrapper.parentNode) {
-                    document.body.removeChild(wrapper);
-                }
-                
-                // blur 효과 복원
-                originalBlurStyles.forEach(state => {
-                    state.element.style.filter = state.filter;
-                    state.element.style.backdropFilter = state.backdropFilter;
-                });
-                // 원본 요소 복원
-                if (wasHidden) {
-                    resultContent.classList.add('hidden');
-                }
-                resultContent.style.cssText = originalStyle;
-                resultContent.style.background = originalBackground;
-                resultContent.style.backgroundColor = originalBackgroundColor;
-                resultContent.style.paddingTop = originalPaddingTop;
-                resultContent.style.transform = '';
-                resultContent.style.left = '';
-                resultContent.style.top = '';
-                
-                // 버튼 복원
-                buttonStates.forEach(state => {
-                    state.element.style.display = state.display;
-                });
-                
-                // Canvas가 비어있는지 확인
-                if (!canvas || canvas.width === 0 || canvas.height === 0) {
-                    throw new Error('캔버스가 비어있습니다.');
-                }
-                
-                // 다운로드 함수
-                const downloadImage = (dataUrl) => {
-                    try {
-                        // 파일명 생성
-                        const fileName = '기질유형테스트_결과_' + new Date().getTime() + '.png';
-                        
-                        const link = document.createElement('a');
-                        link.download = fileName;
-                        link.href = dataUrl;
-                        link.setAttribute('download', fileName); // 명시적으로 설정
-                        link.setAttribute('target', '_self'); // 새 탭에서 열리지 않도록
-                        link.style.display = 'none';
-                        link.style.position = 'absolute';
-                        link.style.left = '-9999px';
-                        link.style.visibility = 'hidden';
-                        
-                        // 클릭 이벤트 핸들러 추가 (기본 동작 방지)
-                        link.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                        }, true);
-                        
-                        // body에 추가
-                        document.body.appendChild(link);
-                        
-                        // 약간의 지연 후 클릭 (렌더링 완료 보장)
-                        setTimeout(() => {
-                            // 직접 click() 호출 (가장 확실한 방법)
-                            if (typeof link.click === 'function') {
-                                link.click();
-                            } else {
-                                // click()이 없는 경우 이벤트 발생
-                                const clickEvent = new MouseEvent('click', {
-                                    view: window,
-                                    bubbles: true,
-                                    cancelable: true,
-                                    buttons: 1
-                                });
-                                link.dispatchEvent(clickEvent);
-                            }
-                            
-                            // 정리
-                            setTimeout(() => {
-                                if (link.parentNode) {
-                                    document.body.removeChild(link);
-                                }
-                                
-                                // 버튼 복원
-                                downloadBtn.innerHTML = originalHTML;
-                                downloadBtn.disabled = false;
-                            }, 200);
-                        }, 100);
-                    } catch (downloadErr) {
-                        console.error('다운로드 실패:', downloadErr);
-                        alert('다운로드에 실패했습니다: ' + downloadErr.message);
-                        downloadBtn.innerHTML = originalHTML;
-                        downloadBtn.disabled = false;
-                    }
-                };
-                
-                // data URL을 직접 사용 (Safari 호환성 향상)
-                const dataUrl = canvas.toDataURL('image/png', 1.0);
-                downloadImage(dataUrl);
-            }).catch(err => {
-                // blur 효과 복원
-                originalBlurStyles.forEach(state => {
-                    state.element.style.filter = state.filter;
-                    state.element.style.backdropFilter = state.backdropFilter;
-                });
-                
-                console.error('html2canvas 오류:', err);
-                
-                // 원본 요소 복원
-                if (wasHidden) {
-                    resultContent.classList.add('hidden');
-                }
-                resultContent.style.cssText = originalStyle;
-                resultContent.style.background = originalBackground;
-                resultContent.style.backgroundColor = originalBackgroundColor;
-                resultContent.style.paddingTop = originalPaddingTop;
-                resultContent.style.transform = '';
-                resultContent.style.left = '';
-                resultContent.style.top = '';
-                
-                // 버튼 복원
-                buttonStates.forEach(state => {
-                    state.element.style.display = state.display;
-                });
-                
-                alert('이미지 저장에 실패했습니다.\n오류: ' + (err.message || '알 수 없는 오류') + '\n\n브라우저 콘솔을 확인해주세요.');
-                
-                // 버튼 복원
-                downloadBtn.innerHTML = originalHTML;
-                downloadBtn.disabled = false;
-            });
-        } catch (err) {
-            // 래퍼 제거 (에러 발생 시)
-            const existingWrapper = document.querySelector('div[style*="left: -9999px"]');
-            if (existingWrapper && existingWrapper.parentNode) {
-                document.body.removeChild(existingWrapper);
-            }
-            
-            // blur 효과 복원
-            originalBlurStyles.forEach(state => {
-                state.element.style.filter = state.filter;
-                state.element.style.backdropFilter = state.backdropFilter;
-            });
-            
-            console.error('캡처 오류:', err);
-            
-            // 원본 요소 복원
-            if (wasHidden) {
-                resultContent.classList.add('hidden');
-            }
-            resultContent.style.cssText = originalStyle;
-            resultContent.style.background = originalBackground;
-            resultContent.style.backgroundColor = originalBackgroundColor;
-            resultContent.style.paddingTop = originalPaddingTop;
-            resultContent.style.transform = '';
-            resultContent.style.left = '';
-            resultContent.style.top = '';
-            
-            // 버튼 복원
-            buttonStates.forEach(state => {
-                state.element.style.display = state.display;
-            });
-            
-            alert('이미지 저장 중 오류가 발생했습니다: ' + err.message);
-            downloadBtn.innerHTML = originalHTML;
-            downloadBtn.disabled = false;
-        }
-    }
-}
