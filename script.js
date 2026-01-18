@@ -42,10 +42,10 @@ const questions = [
 ];
 
 const types = [
-    { name: "표현형 (Expressive)", desc: "활기차고 사교적이며 분위기를 주도하는 에너지가 넘치는 유형" },
-    { name: "추진형 (Driving)", desc: "목표 지향적이고 결단력이 있으며 리더십이 강한 유형" },
-    { name: "성찰형 (Analytical)", desc: "신중하고 분석적이며 깊이 있는 사고를 하는 유형" },
-    { name: "안정형 (Amiable)", desc: "평화롭고 조화로우며 타인을 배려하는 따뜻한 유형" }
+    { name: "표현형 (Expressive)", desc: "활기차고 사교적이며 분위기를 주도하는 에너지가 넘치는 유형", color: "orange" },
+    { name: "추진형 (Driving)", desc: "목표 지향적이고 결단력이 있으며 리더십이 강한 유형", color: "purple" },
+    { name: "성찰형 (Analytical)", desc: "신중하고 분석적이며 깊이 있는 사고를 하는 유형", color: "teal" },
+    { name: "안정형 (Amiable)", desc: "평화롭고 조화로우며 타인을 배려하는 따뜻한 유형", color: "green" }
 ];
 
 let currentQuestionIndex = 0;
@@ -90,8 +90,8 @@ function renderQuestion() {
     
     question.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
-        btn.className = 'option-btn w-full text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-brand-300 hover:bg-brand-50 text-slate-700 font-medium transition-all shadow-sm';
-        btn.innerHTML = `<span class="inline-block w-6 h-6 rounded-full bg-slate-100 text-slate-500 text-xs flex items-center justify-center mr-3 font-bold group-hover:bg-brand-200 group-hover:text-brand-700">${idx + 1}</span>${opt}`;
+        btn.className = 'option-btn w-full text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-purple-300 hover:bg-purple-50 text-slate-700 font-medium transition-all shadow-sm hover:shadow-md';
+        btn.innerHTML = `<span class="inline-block w-7 h-7 rounded-full bg-purple-500 text-white text-xs flex items-center justify-center mr-3 font-bold">${idx + 1}</span><span class="text-sm">${opt}</span>`;
         
         btn.onclick = () => handleAnswer(idx);
         grid.appendChild(btn);
@@ -137,10 +137,36 @@ function showResult() {
     document.getElementById('result-type').textContent = primaryName;
     document.getElementById('result-desc').textContent = primaryResult.type.desc;
     
+    // 주기질 카드 색상 적용
+    const primaryCard = document.getElementById('primary-card');
+    const primaryColor = primaryResult.type.color;
+    if (primaryColor === 'orange') {
+        primaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-orange-500';
+    } else if (primaryColor === 'purple') {
+        primaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-purple-500';
+    } else if (primaryColor === 'teal') {
+        primaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-teal-500';
+    } else if (primaryColor === 'green') {
+        primaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-green-500';
+    }
+    
     // 보조기질 표시 (영문 제거하여 더 짧게)
     const secondaryName = secondaryResult.type.name.split('(')[0].trim();
     document.getElementById('sub-result-type').textContent = secondaryName;
     document.getElementById('sub-result-desc').textContent = secondaryResult.type.desc;
+    
+    // 보조기질 카드 색상 적용
+    const secondaryCard = document.getElementById('secondary-card');
+    const secondaryColor = secondaryResult.type.color;
+    if (secondaryColor === 'orange') {
+        secondaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-orange-400';
+    } else if (secondaryColor === 'purple') {
+        secondaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-purple-400';
+    } else if (secondaryColor === 'teal') {
+        secondaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-teal-400';
+    } else if (secondaryColor === 'green') {
+        secondaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-green-400';
+    }
     
     // Render details - Sort by score (descending) for better visibility
     const detailsContainer = document.getElementById('score-details');
@@ -151,48 +177,99 @@ function showResult() {
         const isPrimary = index === primaryIndex;
         const isSecondary = index === secondaryIndex;
         
+        // 타입별 색상 결정
+        const typeColor = type.color;
         let bgClass, borderClass, textClass, barClass, rankClass;
+        
         if (isPrimary) {
-            bgClass = 'bg-brand-50';
-            borderClass = 'border-brand-400';
-            textClass = 'text-brand-700';
-            barClass = 'bg-brand-500';
-            rankClass = 'text-brand-600';
+            if (typeColor === 'orange') {
+                bgClass = 'bg-orange-50';
+                borderClass = 'border-orange-300';
+                textClass = 'text-orange-700';
+                barClass = 'bg-orange-500';
+                rankClass = 'text-orange-600';
+            } else if (typeColor === 'purple') {
+                bgClass = 'bg-purple-50';
+                borderClass = 'border-purple-300';
+                textClass = 'text-purple-700';
+                barClass = 'bg-purple-500';
+                rankClass = 'text-purple-600';
+            } else if (typeColor === 'teal') {
+                bgClass = 'bg-teal-50';
+                borderClass = 'border-teal-300';
+                textClass = 'text-teal-700';
+                barClass = 'bg-teal-500';
+                rankClass = 'text-teal-600';
+            } else if (typeColor === 'green') {
+                bgClass = 'bg-green-50';
+                borderClass = 'border-green-300';
+                textClass = 'text-green-700';
+                barClass = 'bg-green-500';
+                rankClass = 'text-green-600';
+            }
         } else if (isSecondary) {
-            bgClass = 'bg-brand-50/50';
-            borderClass = 'border-brand-300';
-            textClass = 'text-brand-600';
-            barClass = 'bg-brand-400';
-            rankClass = 'text-brand-500';
+            if (typeColor === 'orange') {
+                bgClass = 'bg-orange-50/70';
+                borderClass = 'border-orange-200';
+                textClass = 'text-orange-600';
+                barClass = 'bg-orange-400';
+                rankClass = 'text-orange-500';
+            } else if (typeColor === 'purple') {
+                bgClass = 'bg-purple-50/70';
+                borderClass = 'border-purple-200';
+                textClass = 'text-purple-600';
+                barClass = 'bg-purple-400';
+                rankClass = 'text-purple-500';
+            } else if (typeColor === 'teal') {
+                bgClass = 'bg-teal-50/70';
+                borderClass = 'border-teal-200';
+                textClass = 'text-teal-600';
+                barClass = 'bg-teal-400';
+                rankClass = 'text-teal-500';
+            } else if (typeColor === 'green') {
+                bgClass = 'bg-green-50/70';
+                borderClass = 'border-green-200';
+                textClass = 'text-green-600';
+                barClass = 'bg-green-400';
+                rankClass = 'text-green-500';
+            }
         } else {
             bgClass = 'bg-slate-50';
             borderClass = 'border-slate-200';
             textClass = 'text-slate-600';
-            barClass = 'bg-slate-300';
+            if (typeColor === 'orange') {
+                barClass = 'bg-orange-300';
+            } else if (typeColor === 'purple') {
+                barClass = 'bg-purple-300';
+            } else if (typeColor === 'teal') {
+                barClass = 'bg-teal-300';
+            } else if (typeColor === 'green') {
+                barClass = 'bg-green-300';
+            }
             rankClass = 'text-slate-500';
         }
         
         const row = document.createElement('div');
-        row.className = `p-2 rounded-lg border transition-all ${bgClass} ${borderClass}`;
+        row.className = `p-3.5 rounded-xl border-2 transition-all ${bgClass} ${borderClass} shadow-sm hover:shadow-md`;
         
         row.innerHTML = `
-            <div class="flex items-center justify-between mb-1">
-                <div class="flex items-center gap-1.5 flex-1 min-w-0">
-                    <span class="text-xs font-bold ${rankClass} whitespace-nowrap">
+            <div class="flex items-center justify-between mb-2.5">
+                <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                    <span class="text-sm font-bold ${rankClass} whitespace-nowrap bg-white px-2 py-1 rounded-md">
                         ${displayIdx + 1}위
                     </span>
-                    <span class="text-xs font-semibold ${textClass} truncate break-words">
+                    <span class="text-sm font-semibold ${textClass} truncate break-words">
                         ${type.name.split('(')[0].trim()}
                     </span>
                 </div>
                 <div class="text-right ml-2">
-                    <div class="text-sm font-bold ${textClass}">
+                    <div class="text-lg font-bold ${textClass}">
                         ${score}점
                     </div>
                 </div>
             </div>
-            <div class="h-1.5 w-full bg-white rounded-full overflow-hidden">
-                <div class="h-full ${barClass} transition-all duration-500" 
+            <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full ${barClass} transition-all duration-500 rounded-full" 
                      style="width: ${percent}%"></div>
             </div>
         `;

@@ -12,14 +12,37 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            900: '#0c4a6e',
+                        // 보라색 (추진형)
+                        purple: {
+                            50: '#faf5ff',
+                            100: '#f3e8ff',
+                            400: '#c084fc',
+                            500: '#a855f7',
+                            600: '#9333ea',
+                        },
+                        // 초록색 (안정형)
+                        green: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                        },
+                        // 청록색 (성찰형)
+                        teal: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                        },
+                        // 오렌지 (표현형)
+                        orange: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
                         }
                     }
                 }
@@ -31,40 +54,39 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
-<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-50 to-white p-2 sm:p-4">
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 bg-gradient-to-br from-slate-50 to-slate-100">
 
     <div class="w-full max-w-lg mx-auto">
         <!-- Start Screen -->
-        <div id="start-screen" class="glass-panel p-8 rounded-2xl text-center fade-in">
+        <div id="start-screen" class="bg-white p-8 rounded-2xl text-center fade-in shadow-lg">
             <div class="mb-6">
-                <span class="inline-block px-3 py-1 text-xs font-medium text-brand-600 bg-brand-50 rounded-full mb-3">심리
-                    테스트</span>
+                <span class="inline-block px-4 py-1.5 text-xs font-semibold text-purple-600 bg-purple-50 rounded-full mb-4">✨ 심리 테스트</span>
                 <h1 class="text-3xl font-bold text-slate-800 mb-2">기질유형테스트</h1>
-                <p class="text-slate-500">나의 숨겨진 기질을 알아보세요.</p>
+                <p class="text-slate-600">나의 숨겨진 기질을 알아보세요</p>
             </div>
 
-            <div class="space-y-4 mb-8 text-left bg-white/50 p-6 rounded-xl border border-white/60">
+            <div class="space-y-4 mb-8 text-left bg-slate-50 p-6 rounded-xl border border-slate-200">
                 <p class="text-slate-700 text-sm leading-relaxed">
-                    🧐 <strong>테스트 방법</strong><br>
+                    🧐 <strong class="text-slate-800">테스트 방법</strong><br>
                     총 40개의 문항이 주어집니다.<br>
                     가장 본인과 가깝다고 생각되는 문장을 선택해주세요.
                 </p>
             </div>
 
             <button onclick="startTest()"
-                class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-[0.98] mb-6">
+                class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-[0.98] mb-6">
                 테스트 시작하기
             </button>
             
             <div class="flex justify-center mt-6 pt-6 border-t border-slate-200">
-                <div class="p-3 bg-white rounded-full shadow-md border-2 border-slate-200">
-                    <img src="fl_logo4.png" alt="Logo" class="h-12 w-auto rounded-full">
+                <div class="px-5 py-2.5 bg-slate-100 rounded-full">
+                    <span class="flowlab-text text-slate-700 font-bold tracking-wider">FLOWLAB</span>
                 </div>
             </div>
         </div>
 
         <!-- Quiz Screen -->
-        <div id="quiz-screen" class="hidden glass-panel p-6 rounded-2xl relative min-h-[500px] flex flex-col">
+        <div id="quiz-screen" class="hidden bg-white p-6 rounded-2xl relative min-h-[500px] flex flex-col shadow-lg">
             <!-- Header -->
             <div class="mb-6">
                 <div class="flex justify-between items-end mb-2">
@@ -74,7 +96,7 @@
                 </div>
                 <!-- Progress Bar -->
                 <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div id="progress-bar" class="h-full bg-brand-500 progress-bar-fill" style="width: 2.5%"></div>
+                    <div id="progress-bar" class="h-full bg-purple-500 progress-bar-fill rounded-full" style="width: 2.5%"></div>
                 </div>
             </div>
 
@@ -85,64 +107,64 @@
             
             <!-- Logo -->
             <div class="flex justify-center mt-6 pt-6 border-t border-slate-200">
-                <div class="p-3 bg-white rounded-full shadow-md border-2 border-slate-200">
-                    <img src="fl_logo4.png" alt="Logo" class="h-12 w-auto rounded-full">
+                <div class="px-5 py-2.5 bg-slate-100 rounded-full">
+                    <span class="flowlab-text text-slate-700 font-bold tracking-wider">FLOWLAB</span>
                 </div>
             </div>
         </div>
 
         <!-- Result Screen -->
-        <div id="result-screen" class="hidden bg-white rounded-xl text-center fade-in shadow-lg" style="max-height: calc(100vh - 1rem); overflow-y: auto; padding: 1.5rem 1rem 1rem 1rem;">
-            <h2 class="text-base font-bold text-slate-900 mb-3">기질 유형 테스트 결과</h2>
+        <div id="result-screen" class="hidden bg-white rounded-2xl text-center fade-in shadow-xl" style="max-height: calc(100vh - 1rem); overflow-y: auto; padding: 1.5rem 1rem 1rem 1rem;">
+            <h2 class="text-2xl font-bold text-slate-900 mb-5">기질 유형 테스트 결과</h2>
 
             <!-- 주기질 & 보조기질 (나란히 배치) -->
-            <div class="grid grid-cols-2 gap-2.5 mb-3">
+            <div class="grid grid-cols-2 gap-3 mb-5">
                 <!-- 주기질 -->
-                <div class="bg-gradient-to-br from-brand-500 to-brand-600 p-3 rounded-xl shadow-lg">
-                    <div class="text-[11px] font-semibold text-white/95 mb-1 uppercase tracking-wider">주 기질</div>
-                    <h3 id="result-type" class="text-base font-bold text-white mb-1 leading-snug break-words">타입 이름</h3>
-                    <p id="result-desc" class="text-white/95 text-[11px] leading-relaxed line-clamp-3 break-words">
+                <div id="primary-card" class="p-4 rounded-xl shadow-lg text-white">
+                    <div class="text-xs font-bold text-white/90 mb-2 uppercase tracking-wider">주 기질</div>
+                    <h3 id="result-type" class="text-lg font-bold text-white mb-2 leading-tight break-words">타입 이름</h3>
+                    <p id="result-desc" class="text-white/90 text-xs leading-relaxed line-clamp-3 break-words">
                         여기에 결과 설명이 들어갑니다.
                     </p>
                 </div>
 
                 <!-- 보조기질 -->
-                <div class="bg-gradient-to-br from-brand-400 to-brand-500 p-3 rounded-xl shadow-lg">
-                    <div class="text-[11px] font-semibold text-white/95 mb-1 uppercase tracking-wider">보조 기질</div>
-                    <h3 id="sub-result-type" class="text-base font-bold text-white mb-1 leading-snug break-words">타입 이름</h3>
-                    <p id="sub-result-desc" class="text-white/95 text-[11px] leading-relaxed line-clamp-3 break-words">
+                <div id="secondary-card" class="p-4 rounded-xl shadow-lg text-white">
+                    <div class="text-xs font-bold text-white/90 mb-2 uppercase tracking-wider">보조 기질</div>
+                    <h3 id="sub-result-type" class="text-lg font-bold text-white mb-2 leading-tight break-words">타입 이름</h3>
+                    <p id="sub-result-desc" class="text-white/90 text-xs leading-relaxed line-clamp-3 break-words">
                         여기에 보조 기질 설명이 들어갑니다.
                     </p>
                 </div>
             </div>
 
             <!-- 기질 유형별 점수 (컴팩트) -->
-            <div class="mb-3">
-                <p class="text-xs font-semibold text-slate-800 mb-2">기질 유형별 점수</p>
-                <div id="score-details" class="space-y-1.5">
+            <div class="mb-5">
+                <p class="text-sm font-bold text-slate-800 mb-3">기질 유형별 점수</p>
+                <div id="score-details" class="space-y-2.5">
                     <!-- Scores injected via JS -->
                 </div>
             </div>
 
             <!-- 버튼 (하단 고정용 공간) -->
-            <div class="flex gap-2 mb-3">
+            <div class="flex gap-2.5 mb-3">
                 <button onclick="downloadResult()"
-                    class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-medium py-2.5 rounded-lg transition-colors shadow-md flex items-center justify-center gap-1.5 text-xs">
+                    class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-1.5 text-xs">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
                     저장
                 </button>
                 <button onclick="restartTest()"
-                    class="flex-1 bg-white border-2 border-brand-300 text-brand-600 hover:bg-brand-50 font-medium py-2.5 rounded-lg transition-colors text-xs">
+                    class="flex-1 bg-white border-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-bold py-3 rounded-xl transition-all text-xs">
                     다시하기
                 </button>
             </div>
             
             <!-- 로고 텍스트 (하단) -->
             <div class="flex justify-center pt-3 border-t border-slate-200">
-                <div class="px-5 py-2.5 bg-gradient-to-br from-brand-500 to-brand-600 rounded-full shadow-lg">
-                    <span class="flowlab-text text-white font-bold tracking-wider">FLOWLAB</span>
+                <div class="px-5 py-2.5 bg-slate-100 rounded-full">
+                    <span class="flowlab-text text-slate-700 font-bold tracking-wider">FLOWLAB</span>
                 </div>
             </div>
         </div>
