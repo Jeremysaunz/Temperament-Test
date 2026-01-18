@@ -237,6 +237,8 @@ function downloadResult() {
     // 원본 요소의 상태 저장
     const wasHidden = resultContent.classList.contains('hidden');
     const originalStyle = resultContent.style.cssText;
+    const originalBackground = resultContent.style.background;
+    const originalBackgroundColor = resultContent.style.backgroundColor;
     
     // 원본 요소를 보이게 만들기 (캡처를 위해)
     resultContent.classList.remove('hidden');
@@ -245,6 +247,8 @@ function downloadResult() {
     resultContent.style.top = '0';
     resultContent.style.zIndex = '9999';
     resultContent.style.width = resultContent.offsetWidth + 'px';
+    resultContent.style.background = '#ffffff'; // 흰색 배경 강제
+    resultContent.style.backgroundColor = '#ffffff';
     
     // 버튼들을 임시로 숨기기
     const buttons = resultContent.querySelectorAll('button');
@@ -307,7 +311,7 @@ function downloadResult() {
             
             // html2canvas로 캡처 (고해상도)
             html2canvas(resultContent, {
-                backgroundColor: '#f8fafc',
+                backgroundColor: '#ffffff', // 순수 흰색 배경으로 변경
                 scale: 3, // 해상도 3배로 증가 (더 선명하게)
                 useCORS: true,
                 logging: false,
@@ -328,6 +332,51 @@ function downloadResult() {
                     clonedBlurElements.forEach(el => {
                         el.style.filter = 'none';
                         el.style.backdropFilter = 'none';
+                        el.style.opacity = '1'; // 투명도 제거
+                    });
+                    
+                    // glass-panel 효과 제거 (더 선명하게)
+                    const glassPanels = clonedDoc.querySelectorAll('.glass-panel');
+                    glassPanels.forEach(panel => {
+                        panel.style.background = '#ffffff';
+                        panel.style.backdropFilter = 'none';
+                        panel.style.webkitBackdropFilter = 'none';
+                    });
+                    
+                    // 배경을 흰색으로 강제
+                    const resultScreen = clonedDoc.getElementById('result-screen');
+                    if (resultScreen) {
+                        resultScreen.style.background = '#ffffff';
+                        resultScreen.style.backgroundColor = '#ffffff';
+                    }
+                    
+                    // 텍스트 색상을 더 진하게 강제 (가독성 향상)
+                    const textElements = clonedDoc.querySelectorAll('h2, h3, p, span, div');
+                    textElements.forEach(el => {
+                        const computedStyle = window.getComputedStyle(el);
+                        const color = computedStyle.color;
+                        
+                        // 회색 계열 텍스트를 더 진하게
+                        if (color.includes('rgb(148, 163, 184)') || // slate-400
+                            color.includes('rgb(100, 116, 139)') || // slate-500
+                            color.includes('rgb(71, 85, 105)')) {   // slate-600
+                            el.style.color = '#1e293b'; // slate-800로 강제
+                        }
+                        
+                        // slate-700도 더 진하게
+                        if (color.includes('rgb(51, 65, 85)')) { // slate-700
+                            el.style.color = '#0f172a'; // slate-900로 강제
+                        }
+                    });
+                    
+                    // 배경이 투명하거나 반투명한 요소들을 흰색으로
+                    const bgElements = clonedDoc.querySelectorAll('[class*="bg-white"], [class*="bg-slate"]');
+                    bgElements.forEach(el => {
+                        const computedStyle = window.getComputedStyle(el);
+                        const bgColor = computedStyle.backgroundColor;
+                        if (bgColor.includes('rgba') && bgColor.includes('0.') || bgColor === 'transparent') {
+                            el.style.backgroundColor = '#ffffff';
+                        }
                     });
                 }
             }).then(canvas => {
@@ -341,6 +390,8 @@ function downloadResult() {
                     resultContent.classList.add('hidden');
                 }
                 resultContent.style.cssText = originalStyle;
+                resultContent.style.background = originalBackground;
+                resultContent.style.backgroundColor = originalBackgroundColor;
                 
                 // 버튼 복원
                 buttonStates.forEach(state => {
@@ -411,26 +462,40 @@ function downloadResult() {
                     downloadImage(dataUrl);
                 }
             }).catch(err => {
-            console.error('html2canvas 오류:', err);
-            
-            // 원본 요소 복원
-            if (wasHidden) {
-                resultContent.classList.add('hidden');
-            }
-            resultContent.style.cssText = originalStyle;
-            
-            // 버튼 복원
-            buttonStates.forEach(state => {
-                state.element.style.display = state.display;
+                // blur 효과 복원
+                originalBlurStyles.forEach(state => {
+                    state.element.style.filter = state.filter;
+                    state.element.style.backdropFilter = state.backdropFilter;
+                });
+                
+                console.error('html2canvas 오류:', err);
+                
+                // 원본 요소 복원
+                if (wasHidden) {
+                    resultContent.classList.add('hidden');
+                }
+                resultContent.style.cssText = originalStyle;
+                resultContent.style.background = originalBackground;
+                resultContent.style.backgroundColor = originalBackgroundColor;
+                
+                // 버튼 복원
+                buttonStates.forEach(state => {
+                    state.element.style.display = state.display;
+                });
+                
+                alert('이미지 저장에 실패했습니다.\n오류: ' + (err.message || '알 수 없는 오류') + '\n\n브라우저 콘솔을 확인해주세요.');
+                
+                // 버튼 복원
+                downloadBtn.innerHTML = originalHTML;
+                downloadBtn.disabled = false;
+            });
+        } catch (err) {
+            // blur 효과 복원
+            originalBlurStyles.forEach(state => {
+                state.element.style.filter = state.filter;
+                state.element.style.backdropFilter = state.backdropFilter;
             });
             
-            alert('이미지 저장에 실패했습니다.\n오류: ' + (err.message || '알 수 없는 오류') + '\n\n브라우저 콘솔을 확인해주세요.');
-            
-            // 버튼 복원
-            downloadBtn.innerHTML = originalHTML;
-            downloadBtn.disabled = false;
-        });
-        } catch (err) {
             console.error('캡처 오류:', err);
             
             // 원본 요소 복원
@@ -438,6 +503,8 @@ function downloadResult() {
                 resultContent.classList.add('hidden');
             }
             resultContent.style.cssText = originalStyle;
+            resultContent.style.background = originalBackground;
+            resultContent.style.backgroundColor = originalBackgroundColor;
             
             // 버튼 복원
             buttonStates.forEach(state => {
