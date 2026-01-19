@@ -609,7 +609,7 @@ function formatSectionContent(content) {
         let processedPara = para;
         let placeholderIndex = 0;
         
-        // HTML 태그를 임시로 치환
+        // HTML 태그를 임시로 치환 (이미 생성된 태그 보호)
         processedPara = processedPara.replace(/<[^>]+>/g, (match) => {
             const placeholder = `__HTML_TAG_${placeholderIndex}__`;
             tagPlaceholders[placeholderIndex] = match;
@@ -618,21 +618,50 @@ function formatSectionContent(content) {
         });
         
         // 번호 항목 패턴: "첫째," 또는 "첫째는" 또는 "첫째 " 또는 "첫째."
-        processedPara = processedPara.replace(/(첫째|둘째|셋째|넷째|다섯째)([는은,]|\.|,| )/g, (match, number, suffix) => {
-            let html = `<span class="inline-block my-2 px-3 py-1 bg-purple-100 text-purple-700 font-bold rounded-md">${number}</span>`;
-            if (suffix === ',' || suffix === '.') {
-                html += suffix;
-            } else if (suffix === '는' || suffix === '은') {
-                html += suffix;
+        // 텍스트를 부분으로 나누어서 플레이스홀더가 아닌 부분만 처리
+        const numberParts = processedPara.split(/(__HTML_TAG_\d+__)/g);
+        let numberProcessed = '';
+        
+        numberParts.forEach(part => {
+            if (part.match(/^__HTML_TAG_\d+__$/)) {
+                // 플레이스홀더는 그대로 유지
+                numberProcessed += part;
             } else {
-                html += '는 ';
+                // 순수 텍스트 부분만 번호 항목 처리
+                part = part.replace(/(첫째|둘째|셋째|넷째|다섯째)([는은,]|\.|,| )/g, (match, number, suffix) => {
+                    let html = `<span class="inline-block my-2 px-3 py-1 bg-purple-100 text-purple-700 font-bold rounded-md">${number}</span>`;
+                    if (suffix === ',' || suffix === '.') {
+                        html += suffix;
+                    } else if (suffix === '는' || suffix === '은') {
+                        html += suffix;
+                    } else {
+                        html += '는 ';
+                    }
+                    return html;
+                });
+                numberProcessed += part;
             }
-            return html;
         });
         
-        // 인용구 강조 ("..." 형식) - 이미 HTML 태그가 아닌 텍스트만
-        processedPara = processedPara.replace(/"([^"]+)"/g, 
-            '<span class="text-purple-600 font-semibold italic bg-purple-50 px-1 rounded">"$1"</span>');
+        processedPara = numberProcessed;
+        
+        // 인용구 강조 ("..." 형식) - 플레이스홀더가 아닌 텍스트만
+        const quoteParts = processedPara.split(/(__HTML_TAG_\d+__)/g);
+        let quoteProcessed = '';
+        
+        quoteParts.forEach(part => {
+            if (part.match(/^__HTML_TAG_\d+__$/)) {
+                // 플레이스홀더는 그대로 유지
+                quoteProcessed += part;
+            } else {
+                // 순수 텍스트 부분만 인용구 처리
+                part = part.replace(/"([^"]+)"/g, 
+                    '<span class="text-purple-600 font-semibold italic bg-purple-50 px-1 rounded">"$1"</span>');
+                quoteProcessed += part;
+            }
+        });
+        
+        processedPara = quoteProcessed;
         
         // 중요한 문구 강조
         const importantPhrases = [
@@ -642,12 +671,28 @@ function formatSectionContent(content) {
             '강점', '역동성', '추진력', '에너지', '성장', '관리 전략'
         ];
         
-        // 중요한 문구 강조 (HTML 태그가 아닌 텍스트만)
-        importantPhrases.forEach(phrase => {
-            const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const regex = new RegExp(`(${escapedPhrase})`, 'g');
-            processedPara = processedPara.replace(regex, '<span class="text-orange-600 font-semibold">$1</span>');
+        // 중요한 문구 강조 (플레이스홀더가 아닌 텍스트만)
+        // 텍스트를 부분으로 나누어서 처리
+        const parts = processedPara.split(/(__HTML_TAG_\d+__)/g);
+        let finalPara = '';
+        
+        parts.forEach(part => {
+            if (part.match(/^__HTML_TAG_\d+__$/)) {
+                // 플레이스홀더는 그대로 유지
+                finalPara += part;
+            } else {
+                // 순수 텍스트 부분만 강조 처리
+                let text = part;
+                importantPhrases.forEach(phrase => {
+                    const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(`(${escapedPhrase})`, 'g');
+                    text = text.replace(regex, '<span class="text-orange-600 font-semibold">$1</span>');
+                });
+                finalPara += text;
+            }
         });
+        
+        processedPara = finalPara;
         
         // 임시로 치환한 HTML 태그를 다시 복원
         tagPlaceholders.forEach((tag, index) => {
