@@ -515,7 +515,7 @@ function findTemperamentDetail(combination) {
 // 상세 설명 내용 포맷팅
 function formatDetailContent(detail) {
     if (!detail || !detail.sections) {
-        return '<p>상세 설명을 불러올 수 없습니다.</p>';
+        return '<p class="text-slate-500 text-center py-8">상세 설명을 불러올 수 없습니다.</p>';
     }
     
     let html = '';
@@ -534,19 +534,105 @@ function formatDetailContent(detail) {
         '이 기질을 한 문장으로 말하면'
     ];
     
+    // 섹션별 색상 정의
+    const sectionColors = {
+        '이 기질은 어떤 에너지 구조인가': 'from-purple-500 to-pink-500',
+        '핵심 성향 한눈에 보기': 'from-blue-500 to-cyan-500',
+        '강점이 발휘되는 순간': 'from-green-500 to-emerald-500',
+        '흔히 겪는 오해와 그림자': 'from-orange-500 to-red-500',
+        '감정 흐름과 회복 패턴': 'from-pink-500 to-rose-500',
+        '관계 속에서의 기질 반응': 'from-indigo-500 to-purple-500',
+        '팀과 조직 안에서의 역할': 'from-teal-500 to-cyan-500',
+        '일하는 방식과 실행 리듬': 'from-amber-500 to-orange-500',
+        '성장 방향과 기질 관리 전략': 'from-violet-500 to-purple-500',
+        '이 기질을 한 문장으로 말하면': 'from-rose-500 to-pink-500'
+    };
+    
     sectionOrder.forEach((sectionTitle, index) => {
         const content = detail.sections[sectionTitle];
         if (content) {
+            const gradientColor = sectionColors[sectionTitle] || 'from-slate-500 to-slate-600';
+            
+            // 내용 포맷팅 (키워드 강조, 인용구 처리)
+            const formattedContent = formatSectionContent(content);
+            
             html += `
-                <div class="mb-6">
-                    <h4 class="text-lg font-bold text-slate-900 mb-3">${index + 1}. ${sectionTitle}</h4>
-                    <div class="text-sm leading-relaxed text-slate-700 whitespace-pre-line">
-                        ${content.replace(/\n/g, '<br>')}
+                <div class="mb-8 pb-8 border-b border-slate-100 last:border-0">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r ${gradientColor} text-white font-bold text-sm flex items-center justify-center shadow-md">
+                            ${index + 1}
+                        </span>
+                        <h4 class="text-xl font-bold bg-gradient-to-r ${gradientColor} bg-clip-text text-transparent">
+                            ${sectionTitle}
+                        </h4>
+                    </div>
+                    <div class="text-base leading-relaxed text-slate-700 ml-11 space-y-4">
+                        ${formattedContent}
                     </div>
                 </div>
             `;
         }
     });
     
-    return html || '<p>상세 설명 내용이 없습니다.</p>';
+    return html || '<p class="text-slate-500 text-center py-8">상세 설명 내용이 없습니다.</p>';
+}
+
+// 섹션 내용 포맷팅 (키워드 강조, 인용구 처리)
+function formatSectionContent(content) {
+    // 먼저 키워드 박스 처리 (다른 포맷팅 전에)
+    let formatted = content;
+    
+    // 키워드 강조 (예: "핵심 키워드: 열정, 카리스마..." 형식)
+    formatted = formatted.replace(/핵심 키워드:\s*([^\n]+)/g, 
+        '<div class="my-5 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border-l-4 border-blue-400 shadow-sm"><span class="font-bold text-blue-700 text-base">핵심 키워드:</span> <span class="text-blue-600 font-semibold">$1</span></div>');
+    
+    // 문단을 줄바꿈 기준으로 분리
+    const paragraphs = formatted.split(/\n\n+/).filter(p => p.trim());
+    
+    let result = '';
+    
+    paragraphs.forEach((para, idx) => {
+        para = para.trim();
+        if (!para) return;
+        
+        // 키워드 박스는 그대로 유지
+        if (para.includes('핵심 키워드:')) {
+            result += para;
+            return;
+        }
+        
+        // 문단 시작
+        let paragraphHtml = '<p class="mb-5 leading-7 text-slate-700">';
+        
+        // 번호가 있는 항목 강조 (첫째, 둘째, 셋째 등)
+        para = para.replace(/(첫째|둘째|셋째|넷째|다섯째)[는은]?\s*([^\.]+?)(?=\.|$|둘째|셋째|넷째|다섯째|첫째)/g, 
+            '<span class="inline-block my-2 px-3 py-1 bg-purple-100 text-purple-700 font-bold rounded-md">$1</span>는 <span class="text-slate-800">$2</span>');
+        
+        // 인용구 강조 ("..." 형식)
+        para = para.replace(/"([^"]+)"/g, 
+            '<span class="text-purple-600 font-semibold italic bg-purple-50 px-1 rounded">"$1"</span>');
+        
+        // 중요한 문구 강조
+        const importantPhrases = [
+            '빠르고 강하게', '0에서 1', '일단 시작하고 보자', '열정적으로 말하고', 
+            '과감하게 행동하는', '강력한 추진력', '폭발적인 에너지', '카리스마',
+            '타고난 능력', '진정한 리더', '핵심', '본질', '중요한', '가장 빛나는',
+            '강점', '역동성', '추진력', '에너지', '성장', '관리 전략'
+        ];
+        
+        importantPhrases.forEach(phrase => {
+            const regex = new RegExp(`(${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'g');
+            para = para.replace(regex, '<span class="text-orange-600 font-semibold">$1</span>');
+        });
+        
+        // 줄바꿈 처리
+        para = para.replace(/\n/g, '<br>');
+        
+        paragraphHtml += para;
+        paragraphHtml += '</p>';
+        
+        result += paragraphHtml;
+    });
+    
+    return result;
 }

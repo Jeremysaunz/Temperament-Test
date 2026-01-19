@@ -54,31 +54,142 @@
 
 <body class="min-h-screen flex items-center justify-center p-2 sm:p-4 bg-gradient-to-br from-slate-50 to-slate-100">
 
-    <div class="w-full max-w-lg mx-auto">
+    <div class="w-full max-w-2xl mx-auto px-2 sm:px-4">
         <!-- Start Screen -->
-        <div id="start-screen" class="bg-white p-8 rounded-2xl text-center fade-in shadow-lg">
-            <div class="mb-6">
-                <span class="inline-block px-4 py-1.5 text-xs font-semibold text-purple-600 bg-purple-50 rounded-full mb-4">✨ 심리 테스트</span>
-                <h1 class="text-3xl font-bold text-slate-800 mb-2">기질유형테스트</h1>
-                <p class="text-slate-600">나의 숨겨진 기질을 알아보세요</p>
+        <div id="start-screen" class="bg-white p-4 sm:p-6 md:p-8 rounded-2xl text-center fade-in shadow-lg">
+            <div class="mb-6 sm:mb-8">
+                <span class="inline-block px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold text-purple-600 bg-purple-50 rounded-full mb-3 sm:mb-4">✨ 심리 테스트</span>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800 mb-2">기질유형테스트</h1>
+                <p class="text-sm sm:text-base text-slate-600">나의 숨겨진 기질을 알아보세요</p>
             </div>
 
-            <div class="space-y-4 mb-8 text-left bg-slate-50 p-6 rounded-xl border border-slate-200">
-                <p class="text-slate-700 text-sm leading-relaxed">
-                    🧐 <strong class="text-slate-800">테스트 방법</strong><br>
-                    총 40개의 문항이 주어집니다.<br>
-                    가장 본인과 가깝다고 생각되는 문장을 선택해주세요.
+            <!-- 테스트 소개 섹션 -->
+            <div class="space-y-4 sm:space-y-5 mb-6 sm:mb-8 text-left">
+                <!-- 첫 번째 카드: 테스트 소개 -->
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-4 sm:p-5 md:p-6 rounded-xl border border-purple-100 shadow-sm">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-md">
+                            💫
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">이 테스트는</h3>
+                            <p class="text-sm sm:text-base leading-relaxed text-slate-700">
+                                당신의 성격을 단순히 분류하기 위한 검사가 아닙니다.<br>
+                                당신이 세상과 에너지를 주고받는 방식,<br>
+                                결정하고 행동하며 관계를 맺는 <span class="text-purple-600 font-semibold">기질의 흐름</span>을 이해하기 위한 도구입니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 두 번째 카드: 기질 모델 설명 -->
+                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 sm:p-5 md:p-6 rounded-xl border border-blue-100 shadow-sm">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-md">
+                            📚
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">기질 모델의 기원</h3>
+                            <p class="text-sm sm:text-base leading-relaxed text-slate-700">
+                                이 기질 모델은 고대부터 이어져 온<br>
+                                <span class="text-blue-600 font-semibold">다혈질, 담즙질, 우울질, 점액질</span>의 4기질 이론을 바탕으로 합니다.<br>
+                                다만 시대에 맞지 않는 명칭과 고정적인 해석에서 벗어나,<br>
+                                이를 <span class="text-blue-600 font-semibold">표현, 추진, 성찰, 안정</span>이라는 현대적 언어로 재구성했습니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 세 번째 카드: 기질의 이해 -->
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-4 sm:p-5 md:p-6 rounded-xl border border-green-100 shadow-sm">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-md">
+                            🌟
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">모든 사람은 네 가지 기질을 가지고 있습니다</h3>
+                            <p class="text-sm sm:text-base leading-relaxed text-slate-700">
+                                사람은 누구나 이 네 가지 기질 요소를 모두 가지고 있습니다.<br>
+                                차이는 <span class="text-green-600 font-semibold">'있다/없다'</span>가 아니라<br>
+                                어떤 기질이 더 자주, 더 강하게 작동하느냐에 있습니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 네 번째 카드: 테스트 방법 -->
+                <div class="bg-gradient-to-br from-orange-50 to-amber-50 p-4 sm:p-5 md:p-6 rounded-xl border border-orange-100 shadow-sm">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-md">
+                            🧐
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">테스트 방법</h3>
+                            <p class="text-sm sm:text-base leading-relaxed text-slate-700 mb-3">
+                                이 테스트는 <span class="text-orange-600 font-semibold">40개의 질문</span>을 통해<br>
+                                당신에게 가장 자연스럽게 나타나는 기질의 조합을 분석하고,<br>
+                                그 결과를 <span class="text-orange-600 font-semibold">12가지 기질 유형</span>으로 제시합니다.
+                            </p>
+                            <div class="bg-white/60 rounded-lg p-3 border border-orange-200">
+                                <p class="text-xs sm:text-sm text-slate-600">
+                                    💡 <strong class="text-slate-800">가장 본인과 가깝다고 생각되는 문장을 선택해주세요.</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 다섯 번째 카드: 테스트 결과 -->
+                <div class="bg-gradient-to-br from-pink-50 to-rose-50 p-4 sm:p-5 md:p-6 rounded-xl border border-pink-100 shadow-sm">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-md">
+                            🎯
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">상세한 결과 제공</h3>
+                            <p class="text-sm sm:text-base leading-relaxed text-slate-700">
+                                결과는 단순한 유형 이름이 아니라<br>
+                                당신의 <span class="text-pink-600 font-semibold">강점과 주의점, 관계 방식, 일과 학습 스타일</span>,<br>
+                                그리고 앞으로의 <span class="text-pink-600 font-semibold">성장 방향</span>까지 함께 안내합니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 여섯 번째 카드: 테스트 목적 -->
+                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-4 sm:p-5 md:p-6 rounded-xl border border-indigo-100 shadow-sm">
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-md">
+                            ✨
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">테스트의 목적</h3>
+                            <p class="text-sm sm:text-base leading-relaxed text-slate-700">
+                                이 테스트의 목적은<br>
+                                <span class="text-indigo-600 font-semibold">"나는 이런 사람이다"</span>라고 규정하는 것이 아니라,<br>
+                                <span class="text-indigo-600 font-semibold">"나는 이런 방식으로 성장할 수 있다"</span>를 이해하는 데 있습니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 시간 안내 -->
+            <div class="mb-6 sm:mb-8 p-3 sm:p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg border border-slate-200">
+                <p class="text-sm sm:text-base text-slate-600">
+                    ⏱️ <span class="font-semibold text-slate-700">약 5분</span>이면 충분합니다.<br>
+                    지금, 당신의 기질 흐름을 확인해보세요.
                 </p>
             </div>
 
             <button onclick="startTest()"
-                class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-[0.98] mb-6">
+                class="w-full bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-bold py-3 sm:py-4 rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-[0.98] mb-4 sm:mb-6 text-sm sm:text-base">
                 테스트 시작하기
             </button>
             
-            <div class="flex justify-center mt-6 pt-6 border-t border-slate-200">
-                <div class="px-5 py-2.5 bg-slate-100 rounded-full">
-                    <span class="flowlab-text text-slate-700 font-bold tracking-wider">FLOWLAB</span>
+            <div class="flex justify-center mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-200">
+                <div class="px-3 py-1.5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-100 shadow-sm">
+                    <span class="flowlab-text text-xs font-bold tracking-widest bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">FLOWLAB</span>
                 </div>
             </div>
         </div>
@@ -113,8 +224,8 @@
             
             <!-- Logo -->
             <div class="flex justify-center mt-6 pt-6 border-t border-slate-200">
-                <div class="px-5 py-2.5 bg-slate-100 rounded-full">
-                    <span class="flowlab-text text-slate-700 font-bold tracking-wider">FLOWLAB</span>
+                <div class="px-3 py-1.5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-100 shadow-sm">
+                    <span class="flowlab-text text-xs font-bold tracking-widest bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">FLOWLAB</span>
                 </div>
             </div>
         </div>
@@ -169,8 +280,8 @@
             
             <!-- 로고 텍스트 (하단) -->
             <div class="flex justify-center pt-3 border-t border-slate-200">
-                <div class="px-5 py-2.5 bg-slate-100 rounded-full">
-                    <span class="flowlab-text text-slate-700 font-bold tracking-wider">FLOWLAB</span>
+                <div class="px-3 py-1.5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-100 shadow-sm">
+                    <span class="flowlab-text text-xs font-bold tracking-widest bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">FLOWLAB</span>
                 </div>
             </div>
         </div>
@@ -179,15 +290,15 @@
     <!-- 상세 설명 모달 -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onclick="handleModalClick(event)">
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
-            <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center z-10">
-                <h3 id="modal-title" class="text-xl font-bold text-slate-900">상세 설명</h3>
-                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <div class="sticky top-0 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-slate-200 px-6 py-5 flex justify-between items-center z-10 backdrop-blur-sm">
+                <h3 id="modal-title" class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">나의 성향분석</h3>
+                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 transition-colors p-1 hover:bg-slate-100 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-            <div id="modal-content" class="px-6 py-6 text-slate-700">
+            <div id="modal-content" class="px-6 py-8 text-slate-700">
                 <!-- 상세 설명 내용이 여기에 표시됩니다 -->
             </div>
         </div>
