@@ -42,15 +42,17 @@ const questions = [
 ];
 
 const types = [
-    { name: "표현형 (Expressive)", desc: "활기차고 사교적이며 분위기를 주도하는 에너지가 넘치는 유형", color: "orange" },
-    { name: "추진형 (Driving)", desc: "목표 지향적이고 결단력이 있으며 리더십이 강한 유형", color: "purple" },
-    { name: "성찰형 (Analytical)", desc: "신중하고 분석적이며 깊이 있는 사고를 하는 유형", color: "teal" },
-    { name: "안정형 (Amiable)", desc: "평화롭고 조화로우며 타인을 배려하는 따뜻한 유형", color: "green" }
+    { name: "표현형 Expressive Type", shortName: "표현", code: "E", englishName: "Expressive", desc: "활기차고 사교적이며 분위기를 주도하는 에너지가 넘치는 유형", color: "orange" },
+    { name: "추진형 Driving Type", shortName: "추진", code: "D", englishName: "Driving", desc: "목표 지향적이고 결단력이 있으며 리더십이 강한 유형", color: "purple" },
+    { name: "성찰형 Reflective Type", shortName: "성찰", code: "R", englishName: "Reflective", desc: "신중하고 분석적이며 깊이 있는 사고를 하는 유형", color: "teal" },
+    { name: "안정형 Stable Type", shortName: "안정", code: "S", englishName: "Stable", desc: "평화롭고 조화로우며 타인을 배려하는 따뜻한 유형", color: "green" }
 ];
 
 let currentQuestionIndex = 0;
 let scores = [0, 0, 0, 0]; // Index 0: 표현형, 1: 추진형, 2: 성찰형, 3: 안정형
 let answers = []; // 사용자가 선택한 답변 저장
+let currentCombination = null; // 현재 조합 결과 저장 (상세 설명용)
+let temperamentDetails = null; // 상세 설명 데이터 저장
 
 const startScreen = document.getElementById('start-screen');
 const quizScreen = document.getElementById('quiz-screen');
@@ -171,10 +173,24 @@ function showResult() {
     const secondaryResult = scoreData[1];
     const secondaryIndex = secondaryResult.index;
     
-    // 주기질 표시 (영문 제거하여 더 짧게)
-    const primaryName = primaryResult.type.name.split('(')[0].trim();
-    document.getElementById('result-type').textContent = primaryName;
-    document.getElementById('result-desc').textContent = primaryResult.type.desc;
+    // 조합 결과 생성: 예) "표현추진형 (Expressive–Driving)"
+    const combinationName = `${primaryResult.type.shortName}${secondaryResult.type.shortName}형`;
+    const combinationEnglish = `(${primaryResult.type.englishName}–${secondaryResult.type.englishName})`;
+    const fullCombination = `${combinationName} ${combinationEnglish}`;
+    
+    // 현재 조합 결과 저장 (상세 설명용)
+    // 영어 이름은 하이픈(-)으로 연결 (파일 형식과 일치)
+    currentCombination = {
+        koreanName: combinationName,
+        englishName: `${primaryResult.type.englishName}-${secondaryResult.type.englishName}`,
+        fullName: fullCombination
+    };
+    
+    console.log('저장된 조합:', currentCombination);
+    
+    // 주기질 표시 (조합 결과 표시)
+    document.getElementById('result-type').textContent = fullCombination;
+    document.getElementById('result-desc').textContent = `${primaryResult.type.desc} + ${secondaryResult.type.desc}`;
     
     // 주기질 카드 색상 적용
     const primaryCard = document.getElementById('primary-card');
@@ -189,23 +205,9 @@ function showResult() {
         primaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-green-500';
     }
     
-    // 보조기질 표시 (영문 제거하여 더 짧게)
-    const secondaryName = secondaryResult.type.name.split('(')[0].trim();
-    document.getElementById('sub-result-type').textContent = secondaryName;
-    document.getElementById('sub-result-desc').textContent = secondaryResult.type.desc;
-    
-    // 보조기질 카드 색상 적용
+    // 보조기질 카드는 숨기기 (조합 결과만 표시)
     const secondaryCard = document.getElementById('secondary-card');
-    const secondaryColor = secondaryResult.type.color;
-    if (secondaryColor === 'orange') {
-        secondaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-orange-400';
-    } else if (secondaryColor === 'purple') {
-        secondaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-purple-400';
-    } else if (secondaryColor === 'teal') {
-        secondaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-teal-400';
-    } else if (secondaryColor === 'green') {
-        secondaryCard.className = 'p-4 rounded-xl shadow-lg text-white bg-green-400';
-    }
+    secondaryCard.style.display = 'none';
     
     // Render details - Sort by score (descending) for better visibility
     const detailsContainer = document.getElementById('score-details');
@@ -298,7 +300,7 @@ function showResult() {
                         ${displayIdx + 1}위
                     </span>
                     <span class="text-sm font-semibold ${textClass} truncate break-words">
-                        ${type.name.split('(')[0].trim()}
+                        ${type.shortName}형
                     </span>
                 </div>
                 <div class="text-right ml-2">
@@ -321,3 +323,230 @@ function restartTest() {
     startTest();
 }
 
+// 상세 설명 모달 열기
+async function showDetailDescription() {
+    if (!currentCombination) {
+        alert('결과를 먼저 확인해주세요.');
+        return;
+    }
+    
+    console.log('현재 조합:', currentCombination);
+    
+    // 상세 설명 데이터가 없으면 로드
+    if (!temperamentDetails) {
+        console.log('상세 설명 데이터 로드 시작...');
+        await loadTemperamentDetails();
+        console.log('로드된 데이터:', temperamentDetails);
+    }
+    
+    // 조합에 맞는 상세 설명 찾기
+    const detail = findTemperamentDetail(currentCombination);
+    console.log('찾은 상세 설명:', detail);
+    
+    if (!detail) {
+        console.error('상세 설명을 찾을 수 없습니다. 현재 조합:', currentCombination);
+        console.log('사용 가능한 키:', temperamentDetails ? Object.keys(temperamentDetails) : '없음');
+        alert('상세 설명을 찾을 수 없습니다. 콘솔을 확인해주세요.');
+        return;
+    }
+    
+    // 모달 제목 설정
+    document.getElementById('modal-title').textContent = currentCombination.fullName;
+    
+    // 모달 내용 설정
+    const modalContent = document.getElementById('modal-content');
+    modalContent.innerHTML = formatDetailContent(detail);
+    
+    // 모달 표시
+    document.getElementById('detail-modal').classList.remove('hidden');
+}
+
+// 모달 닫기
+function closeDetailModal() {
+    document.getElementById('detail-modal').classList.add('hidden');
+}
+
+// 상세 설명 데이터 로드
+async function loadTemperamentDetails() {
+    try {
+        const response = await fetch('12temperament_types.txt');
+        const text = await response.text();
+        temperamentDetails = parseTemperamentDetails(text);
+    } catch (error) {
+        console.error('상세 설명 파일을 불러올 수 없습니다:', error);
+        alert('상세 설명을 불러올 수 없습니다. 파일이 같은 폴더에 있는지 확인해주세요.');
+    }
+}
+
+// 텍스트 파일 파싱 (새로운 형식)
+function parseTemperamentDetails(text) {
+    const details = {};
+    // === TYPE_XX === 형식으로 섹션 분리
+    const sections = text.split(/=== TYPE_\d+ ===/);
+    
+    sections.forEach((section, index) => {
+        if (index === 0) return; // 첫 번째 빈 섹션 건너뛰기
+        
+        const lines = section.trim().split('\n').map(line => line.trim());
+        if (lines.length < 2) return;
+        
+        let koreanName = '';
+        let englishName = '';
+        let currentSection = null;
+        let currentContent = [];
+        const parsedSections = {};
+        let lineIndex = 0;
+        
+        // name_ko: 또는 직접 이름 형식 모두 지원
+        while (lineIndex < lines.length) {
+            const line = lines[lineIndex];
+            if (!line) {
+                lineIndex++;
+                continue;
+            }
+            
+            // name_ko: 표현추진형 형식
+            if (line.startsWith('name_ko:')) {
+                koreanName = line.replace('name_ko:', '').trim();
+                lineIndex++;
+                continue;
+            }
+            // name_en: Expressive-Driving Type 형식
+            else if (line.startsWith('name_en:')) {
+                let en = line.replace('name_en:', '').trim();
+                en = en.replace(/\s+Type$/, '').replace(/[–—]/g, '-');
+                englishName = en;
+                lineIndex++;
+                continue;
+            }
+            // 직접 이름 형식: 첫 번째 줄이 한국어 이름이고, 두 번째 줄이 영어 이름
+            else if (!koreanName && !englishName && lineIndex === 0) {
+                koreanName = line;
+                lineIndex++;
+                // 다음 줄이 영어 이름인지 확인
+                if (lineIndex < lines.length && lines[lineIndex] && !lines[lineIndex].includes(':')) {
+                    englishName = lines[lineIndex].replace(/[–—]/g, '-');
+                    lineIndex++;
+                    continue;
+                }
+            }
+            // 섹션 제목 감지 (예: "1. 이 기질은 어떤 에너지 구조인가")
+            else if (line.match(/^\d+\.\s*(.+)$/)) {
+                // 이전 섹션 저장
+                if (currentSection) {
+                    parsedSections[currentSection] = currentContent.join('\n').trim();
+                }
+                // 새 섹션 시작
+                const match = line.match(/^\d+\.\s*(.+)$/);
+                currentSection = match[1].trim();
+                currentContent = [];
+            }
+            // 메타데이터 필드 건너뛰기
+            else if (line.startsWith('one_line:') || 
+                     line.startsWith('keywords:') || 
+                     line.startsWith('strengths:') || 
+                     line.startsWith('cautions:') ||
+                     line.startsWith('- ')) {
+                // 메타데이터는 건너뛰기
+            }
+            // 섹션 내용 추가
+            else if (currentSection) {
+                currentContent.push(line);
+            }
+            
+            lineIndex++;
+        }
+        
+        // 마지막 섹션 저장
+        if (currentSection) {
+            parsedSections[currentSection] = currentContent.join('\n').trim();
+        }
+        
+        if (koreanName && englishName) {
+            details[koreanName] = {
+                koreanName: koreanName,
+                englishName: englishName,
+                sections: parsedSections
+            };
+            console.log(`파싱 완료: ${koreanName} (${englishName})`);
+        }
+    });
+    
+    console.log('총 파싱된 항목 수:', Object.keys(details).length);
+    console.log('파싱된 키 목록:', Object.keys(details));
+    return details;
+}
+
+// 내용을 섹션별로 파싱 (이미 parseTemperamentDetails에서 처리됨)
+function parseContentSections(content) {
+    // 이 함수는 더 이상 사용되지 않지만 호환성을 위해 유지
+    return {};
+}
+
+// 조합에 맞는 상세 설명 찾기
+function findTemperamentDetail(combination) {
+    if (!temperamentDetails) return null;
+    
+    console.log('찾는 조합:', combination);
+    console.log('사용 가능한 키:', Object.keys(temperamentDetails));
+    
+    // 한국어 이름으로 찾기
+    let detail = temperamentDetails[combination.koreanName];
+    
+    // 영어 이름으로도 찾기 시도 (하이픈 정규화)
+    if (!detail) {
+        const normalizedEnglish = combination.englishName.replace(/[–—]/g, '-');
+        for (const key in temperamentDetails) {
+            const detailItem = temperamentDetails[key];
+            const normalizedDetailEnglish = detailItem.englishName.replace(/[–—]/g, '-');
+            if (normalizedDetailEnglish.toLowerCase() === normalizedEnglish.toLowerCase()) {
+                detail = detailItem;
+                console.log('영어 이름으로 찾음:', key);
+                break;
+            }
+        }
+    } else {
+        console.log('한국어 이름으로 찾음:', combination.koreanName);
+    }
+    
+    return detail;
+}
+
+// 상세 설명 내용 포맷팅
+function formatDetailContent(detail) {
+    if (!detail || !detail.sections) {
+        return '<p>상세 설명을 불러올 수 없습니다.</p>';
+    }
+    
+    let html = '';
+    
+    // 섹션 순서 정의
+    const sectionOrder = [
+        '이 기질은 어떤 에너지 구조인가',
+        '핵심 성향 한눈에 보기',
+        '강점이 발휘되는 순간',
+        '흔히 겪는 오해와 그림자',
+        '감정 흐름과 회복 패턴',
+        '관계 속에서의 기질 반응',
+        '팀과 조직 안에서의 역할',
+        '일하는 방식과 실행 리듬',
+        '성장 방향과 기질 관리 전략',
+        '이 기질을 한 문장으로 말하면'
+    ];
+    
+    sectionOrder.forEach((sectionTitle, index) => {
+        const content = detail.sections[sectionTitle];
+        if (content) {
+            html += `
+                <div class="mb-6">
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">${index + 1}. ${sectionTitle}</h4>
+                    <div class="text-sm leading-relaxed text-slate-700 whitespace-pre-line">
+                        ${content.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    return html || '<p>상세 설명 내용이 없습니다.</p>';
+}
