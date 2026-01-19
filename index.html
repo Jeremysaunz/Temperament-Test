@@ -55,9 +55,67 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 bg-gradient-to-br from-slate-50 to-slate-100">
+<body class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4 bg-gradient-to-br from-slate-50 to-slate-100">
+    <!-- Navigation Bar -->
+    <nav class="w-full max-w-2xl mx-auto mb-4 sm:mb-6">
+        <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-slate-200 px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                </div>
+                <span id="nav-title" class="text-sm sm:text-base font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">기질유형테스트</span>
+            </div>
+            
+            <!-- Language Selector -->
+            <div class="relative group">
+                <button id="lang-button" onclick="toggleLanguageMenu()" class="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 rounded-lg border border-purple-200 transition-all shadow-sm hover:shadow-md">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.196 3.96A6.5 6.5 0 0114.5 12a6.5 6.5 0 01-1.304 3.96M9 19v-2m-6 2h12m-6-2v2" />
+                    </svg>
+                    <span id="current-lang" class="text-xs sm:text-sm font-semibold text-purple-700">한국어</span>
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4 text-purple-600 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                
+                <!-- Language Dropdown Menu -->
+                <div id="lang-menu" class="hidden absolute right-0 mt-2 w-40 sm:w-48 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50">
+                    <button onclick="changeLanguage('ko')" class="lang-option w-full px-4 py-2.5 text-left text-sm hover:bg-purple-50 transition-colors flex items-center gap-2" data-lang="ko">
+                        <span class="font-medium">한국어</span>
+                        <span class="text-xs text-slate-500 ml-auto">Korean</span>
+                    </button>
+                    <button onclick="changeLanguage('en')" class="lang-option w-full px-4 py-2.5 text-left text-sm hover:bg-purple-50 transition-colors flex items-center gap-2" data-lang="en">
+                        <span class="font-medium">English</span>
+                        <span class="text-xs text-slate-500 ml-auto">English</span>
+                    </button>
+                    <button onclick="changeLanguage('es')" class="lang-option w-full px-4 py-2.5 text-left text-sm hover:bg-purple-50 transition-colors flex items-center gap-2" data-lang="es">
+                        <span class="font-medium">Español</span>
+                        <span class="text-xs text-slate-500 ml-auto">Spanish</span>
+                    </button>
+                    <button onclick="changeLanguage('fr')" class="lang-option w-full px-4 py-2.5 text-left text-sm hover:bg-purple-50 transition-colors flex items-center gap-2" data-lang="fr">
+                        <span class="font-medium">Français</span>
+                        <span class="text-xs text-slate-500 ml-auto">French</span>
+                    </button>
+                    <button onclick="changeLanguage('ja')" class="lang-option w-full px-4 py-2.5 text-left text-sm hover:bg-purple-50 transition-colors flex items-center gap-2" data-lang="ja">
+                        <span class="font-medium">日本語</span>
+                        <span class="text-xs text-slate-500 ml-auto">Japanese</span>
+                    </button>
+                    <button onclick="changeLanguage('vi')" class="lang-option w-full px-4 py-2.5 text-left text-sm hover:bg-purple-50 transition-colors flex items-center gap-2" data-lang="vi">
+                        <span class="font-medium">Tiếng Việt</span>
+                        <span class="text-xs text-slate-500 ml-auto">Vietnamese</span>
+                    </button>
+                    <button onclick="changeLanguage('th')" class="lang-option w-full px-4 py-2.5 text-left text-sm hover:bg-purple-50 transition-colors flex items-center gap-2" data-lang="th">
+                        <span class="font-medium">ไทย</span>
+                        <span class="text-xs text-slate-500 ml-auto">Thai</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    <div class="w-full max-w-2xl mx-auto px-2 sm:px-4">
+    <div class="w-full max-w-2xl mx-auto px-2 sm:px-4 flex-1">
         <!-- Start Screen -->
         <div id="start-screen" class="bg-white p-4 sm:p-6 md:p-8 rounded-2xl text-center fade-in shadow-lg overflow-hidden relative">
             <!-- Hero Section -->
@@ -239,7 +297,7 @@
             <!-- Header -->
             <div class="mb-6">
                 <div class="flex justify-between items-end mb-2">
-                    <span class="text-sm font-medium text-slate-400">Question</span>
+                    <span class="text-sm font-medium text-slate-400" id="question-label">Question</span>
                     <span class="text-2xl font-bold text-slate-800" id="question-number">1<span
                             class="text-sm font-normal text-slate-400 ml-1">/ 40</span></span>
                 </div>
@@ -258,7 +316,7 @@
             <div class="mt-4">
                 <button id="prev-button" onclick="goToPreviousQuestion()"
                     class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-lg transition-all text-xs disabled:opacity-50 disabled:cursor-not-allowed">
-                    ← 이전 질문
+                    <span id="prev-question-text">← 이전 질문</span>
                 </button>
             </div>
             
@@ -272,7 +330,7 @@
 
         <!-- Result Screen -->
         <div id="result-screen" class="hidden bg-white rounded-2xl text-center fade-in shadow-xl" style="max-height: calc(100vh - 1rem); overflow-y: auto; padding: 1.5rem 1rem 1rem 1rem;">
-            <h2 class="text-2xl font-bold text-slate-900 mb-5">기질 유형 테스트 결과</h2>
+            <h2 class="text-2xl font-bold text-slate-900 mb-5" id="result-title">기질 유형 테스트 결과</h2>
 
             <!-- 조합 결과 (주기질 + 보조기질) -->
             <div class="mb-5">
@@ -297,7 +355,7 @@
 
             <!-- 기질 유형별 점수 (컴팩트) -->
             <div class="mb-5">
-                <p class="text-sm font-bold text-slate-800 mb-3">기질 유형별 점수</p>
+                <p class="text-sm font-bold text-slate-800 mb-3" id="score-details-label">기질 유형별 점수</p>
                 <div id="score-details" class="space-y-2.5">
                     <!-- Scores injected via JS -->
                 </div>
@@ -310,11 +368,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
-                    <span>나의 성향분석 내용 보기</span>
+                    <span id="view-details-text">나의 성향분석 내용 보기</span>
                 </button>
             <button onclick="restartTest()"
                     class="flex-1 bg-white border-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-bold py-3 rounded-xl transition-all text-xs">
-                    다시하기
+                    <span id="restart-text">다시하기</span>
                 </button>
             </div>
             

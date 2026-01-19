@@ -53,6 +53,7 @@ let scores = [0, 0, 0, 0]; // Index 0: 표현형, 1: 추진형, 2: 성찰형, 3:
 let answers = []; // 사용자가 선택한 답변 저장
 let currentCombination = null; // 현재 조합 결과 저장 (상세 설명용)
 let temperamentDetails = null; // 상세 설명 데이터 저장
+let currentLanguage = 'ko'; // 현재 언어 설정
 
 const startScreen = document.getElementById('start-screen');
 const quizScreen = document.getElementById('quiz-screen');
@@ -710,3 +711,393 @@ function formatSectionContent(content) {
     
     return result;
 }
+
+// 다국어 번역 데이터
+const translations = {
+    ko: {
+        // 네비게이션
+        navTitle: "기질유형테스트",
+        currentLang: "한국어",
+        // 시작 화면
+        testTag: "✨ 심리 테스트",
+        mainTitle: "기질유형테스트",
+        subtitle: "나의 숨겨진 기질을 알아보세요",
+        startButton: "테스트 시작하기",
+        // 퀴즈 화면
+        question: "Question",
+        prevQuestion: "← 이전 질문",
+        // 결과 화면
+        resultTitle: "기질 유형 테스트 결과",
+        temperamentType: "기질 유형",
+        scoreDetails: "기질 유형별 점수",
+        viewDetails: "나의 성향분석 내용 보기",
+        restart: "다시하기",
+        // home.txt 내용
+        testIntro: "이 테스트는",
+        testIntroDesc: "당신의 성격을 단순히 분류하기 위한 검사가 아닙니다.\n당신이 세상과 에너지를 주고받는 방식,\n결정하고 행동하며 관계를 맺는 기질의 흐름을 이해하기 위한 도구입니다.",
+        modelOrigin: "기질 모델의 기원",
+        modelOriginDesc: "이 기질 모델은 고대부터 이어져 온\n다혈질, 담즙질, 우울질, 점액질의 4기질 이론을 바탕으로 합니다.\n다만 시대에 맞지 않는 명칭과 고정적인 해석에서 벗어나,\n이를 표현, 추진, 성찰, 안정이라는 현대적 언어로 재구성했습니다.",
+        allHaveFour: "모든 사람은 네 가지 기질을 가지고 있습니다",
+        allHaveFourDesc: "사람은 누구나 이 네 가지 기질 요소를 모두 가지고 있습니다.\n차이는 '있다/없다'가 아니라\n어떤 기질이 더 자주, 더 강하게 작동하느냐에 있습니다.",
+        testMethod: "테스트 방법",
+        testMethodDesc: "이 테스트는 40개의 질문을 통해\n당신에게 가장 자연스럽게 나타나는 기질의 조합을 분석하고,\n그 결과를 12가지 기질 유형으로 제시합니다.",
+        testMethodTip: "💡 가장 본인과 가깝다고 생각되는 문장을 선택해주세요.",
+        detailedResult: "상세한 결과 제공",
+        detailedResultDesc: "결과는 단순한 유형 이름이 아니라\n당신의 강점과 주의점, 관계 방식, 일과 학습 스타일,\n그리고 앞으로의 성장 방향까지 함께 안내합니다.",
+        testPurpose: "테스트의 목적",
+        testPurposeDesc: "이 테스트의 목적은\n\"나는 이런 사람이다\"라고 규정하는 것이 아니라,\n\"나는 이런 방식으로 성장할 수 있다\"를 이해하는 데 있습니다.",
+        timeInfo: "⏱️ 약 5분이면 충분합니다.\n지금, 당신의 기질 흐름을 확인해보세요.",
+        // 모달
+        modalTitle: "상세 설명",
+        // 타입 이름
+        typeExpressive: "표현형",
+        typeDriving: "추진형",
+        typeReflective: "성찰형",
+        typeStable: "안정형"
+    },
+    en: {
+        navTitle: "Temperament Type Test",
+        currentLang: "English",
+        testTag: "✨ Psychology Test",
+        mainTitle: "Temperament Type Test",
+        subtitle: "Discover your hidden temperament",
+        startButton: "Start Test",
+        question: "Question",
+        prevQuestion: "← Previous Question",
+        resultTitle: "Temperament Type Test Results",
+        temperamentType: "Temperament Type",
+        scoreDetails: "Score by Type",
+        viewDetails: "View My Analysis",
+        restart: "Restart",
+        testIntro: "This test is",
+        testIntroDesc: "not a simple personality classification.\nIt's a tool to understand how you exchange energy with the world,\nhow you make decisions, act, and form relationships—your temperament flow.",
+        modelOrigin: "Origin of the Temperament Model",
+        modelOriginDesc: "This model is based on the ancient four-temperament theory:\nsanguine, choleric, melancholic, and phlegmatic.\nHowever, we've moved away from outdated names and rigid interpretations,\nreconstructing it with modern language: Expressive, Driving, Reflective, and Stable.",
+        allHaveFour: "Everyone Has All Four Temperaments",
+        allHaveFourDesc: "Everyone possesses all four temperament elements.\nThe difference is not 'have or not have',\nbut which temperament operates more frequently and strongly.",
+        testMethod: "Test Method",
+        testMethodDesc: "Through 40 questions,\nthis test analyzes the temperament combination that appears most naturally in you,\nand presents the result as one of 12 temperament types.",
+        testMethodTip: "💡 Please select the statement that feels closest to you.",
+        detailedResult: "Detailed Results",
+        detailedResultDesc: "Results include not just a type name,\nbut your strengths, cautions, relationship style, work and learning style,\nand your growth direction.",
+        testPurpose: "Purpose of the Test",
+        testPurposeDesc: "The purpose is not to define\n\"I am this type of person\",\nbut to understand \"I can grow in this way\".",
+        timeInfo: "⏱️ Takes about 5 minutes.\nCheck your temperament flow now.",
+        modalTitle: "Detailed Description",
+        typeExpressive: "Expressive",
+        typeDriving: "Driving",
+        typeReflective: "Reflective",
+        typeStable: "Stable"
+    },
+    es: {
+        navTitle: "Test de Tipo de Temperamento",
+        currentLang: "Español",
+        testTag: "✨ Test Psicológico",
+        mainTitle: "Test de Tipo de Temperamento",
+        subtitle: "Descubre tu temperamento oculto",
+        startButton: "Comenzar Test",
+        question: "Pregunta",
+        prevQuestion: "← Pregunta Anterior",
+        resultTitle: "Resultados del Test de Temperamento",
+        temperamentType: "Tipo de Temperamento",
+        scoreDetails: "Puntuación por Tipo",
+        viewDetails: "Ver Mi Análisis",
+        restart: "Reiniciar",
+        testIntro: "Este test es",
+        testIntroDesc: "no es una simple clasificación de personalidad.\nEs una herramienta para entender cómo intercambias energía con el mundo,\ncómo tomas decisiones, actúas y formas relaciones—tu flujo de temperamento.",
+        modelOrigin: "Origen del Modelo de Temperamento",
+        modelOriginDesc: "Este modelo se basa en la antigua teoría de los cuatro temperamentos:\nsanguíneo, colérico, melancólico y flemático.\nSin embargo, nos hemos alejado de nombres obsoletos e interpretaciones rígidas,\nreconstruyéndolo con lenguaje moderno: Expresivo, Impulsor, Reflexivo y Estable.",
+        allHaveFour: "Todos Tienen los Cuatro Temperamentos",
+        allHaveFourDesc: "Todos poseen los cuatro elementos del temperamento.\nLa diferencia no es 'tener o no tener',\nsino qué temperamento opera con más frecuencia e intensidad.",
+        testMethod: "Método del Test",
+        testMethodDesc: "A través de 40 preguntas,\neste test analiza la combinación de temperamentos que aparece más naturalmente en ti,\ny presenta el resultado como uno de los 12 tipos de temperamento.",
+        testMethodTip: "💡 Por favor selecciona la afirmación que te resuene más.",
+        detailedResult: "Resultados Detallados",
+        detailedResultDesc: "Los resultados incluyen no solo un nombre de tipo,\nsino tus fortalezas, precauciones, estilo de relación, trabajo y estilo de aprendizaje,\ny tu dirección de crecimiento.",
+        testPurpose: "Propósito del Test",
+        testPurposeDesc: "El propósito no es definir\n\"Soy este tipo de persona\",\nsino entender \"Puedo crecer de esta manera\".",
+        timeInfo: "⏱️ Toma aproximadamente 5 minutos.\nVerifica tu flujo de temperamento ahora.",
+        modalTitle: "Descripción Detallada",
+        typeExpressive: "Expresivo",
+        typeDriving: "Impulsor",
+        typeReflective: "Reflexivo",
+        typeStable: "Estable"
+    },
+    fr: {
+        navTitle: "Test de Type de Tempérament",
+        currentLang: "Français",
+        testTag: "✨ Test Psychologique",
+        mainTitle: "Test de Type de Tempérament",
+        subtitle: "Découvrez votre tempérament caché",
+        startButton: "Commencer le Test",
+        question: "Question",
+        prevQuestion: "← Question Précédente",
+        resultTitle: "Résultats du Test de Tempérament",
+        temperamentType: "Type de Tempérament",
+        scoreDetails: "Score par Type",
+        viewDetails: "Voir Mon Analyse",
+        restart: "Recommencer",
+        testIntro: "Ce test est",
+        testIntroDesc: "pas une simple classification de personnalité.\nC'est un outil pour comprendre comment vous échangez de l'énergie avec le monde,\ncomment vous prenez des décisions, agissez et formez des relations—votre flux de tempérament.",
+        modelOrigin: "Origine du Modèle de Tempérament",
+        modelOriginDesc: "Ce modèle est basé sur l'ancienne théorie des quatre tempéraments:\nsanguin, colérique, mélancolique et flegmatique.\nCependant, nous nous sommes éloignés des noms obsolètes et des interprétations rigides,\nle reconstruisant avec un langage moderne: Expressif, Poussant, Réfléchi et Stable.",
+        allHaveFour: "Tout le Monde a les Quatre Tempéraments",
+        allHaveFourDesc: "Tout le monde possède les quatre éléments du tempérament.\nLa différence n'est pas 'avoir ou ne pas avoir',\nmais quel tempérament fonctionne plus fréquemment et intensément.",
+        testMethod: "Méthode du Test",
+        testMethodDesc: "À travers 40 questions,\nce test analyse la combinaison de tempéraments qui apparaît le plus naturellement en vous,\net présente le résultat comme l'un des 12 types de tempérament.",
+        testMethodTip: "💡 Veuillez sélectionner l'affirmation qui vous ressemble le plus.",
+        detailedResult: "Résultats Détaillés",
+        detailedResultDesc: "Les résultats incluent non seulement un nom de type,\nmais vos forces, précautions, style de relation, travail et style d'apprentissage,\net votre direction de croissance.",
+        testPurpose: "Objectif du Test",
+        testPurposeDesc: "L'objectif n'est pas de définir\n\"Je suis ce type de personne\",\nmais de comprendre \"Je peux grandir de cette manière\".",
+        timeInfo: "⏱️ Prend environ 5 minutes.\nVérifiez votre flux de tempérament maintenant.",
+        modalTitle: "Description Détaillée",
+        typeExpressive: "Expressif",
+        typeDriving: "Poussant",
+        typeReflective: "Réfléchi",
+        typeStable: "Stable"
+    },
+    ja: {
+        navTitle: "気質タイプテスト",
+        currentLang: "日本語",
+        testTag: "✨ 心理テスト",
+        mainTitle: "気質タイプテスト",
+        subtitle: "あなたの隠された気質を発見しましょう",
+        startButton: "テストを開始",
+        question: "質問",
+        prevQuestion: "← 前の質問",
+        resultTitle: "気質タイプテスト結果",
+        temperamentType: "気質タイプ",
+        scoreDetails: "タイプ別スコア",
+        viewDetails: "私の分析を見る",
+        restart: "やり直す",
+        testIntro: "このテストは",
+        testIntroDesc: "単純な性格分類ではありません。\n世界とエネルギーを交換する方法、\n決定し、行動し、関係を築く気質の流れを理解するためのツールです。",
+        modelOrigin: "気質モデルの起源",
+        modelOriginDesc: "このモデルは古代から続く\n多血質、胆汁質、憂鬱質、粘液質の4気質理論に基づいています。\nしかし、時代に合わない名称と固定的な解釈から離れ、\n表現、推進、内省、安定という現代的な言語で再構成しました。",
+        allHaveFour: "すべての人が4つの気質を持っています",
+        allHaveFourDesc: "誰もがこの4つの気質要素をすべて持っています。\n違いは「ある/ない」ではなく、\nどの気質がより頻繁に、より強く機能するかです。",
+        testMethod: "テスト方法",
+        testMethodDesc: "40の質問を通じて、\nあなたに最も自然に現れる気質の組み合わせを分析し、\nその結果を12種類の気質タイプとして提示します。",
+        testMethodTip: "💡 自分に最も近いと思う文章を選択してください。",
+        detailedResult: "詳細な結果",
+        detailedResultDesc: "結果は単純なタイプ名だけでなく、\nあなたの強みと注意点、関係の仕方、仕事と学習スタイル、\nそして今後の成長方向まで一緒に案内します。",
+        testPurpose: "テストの目的",
+        testPurposeDesc: "このテストの目的は、\n「私はこのような人だ」と規定するのではなく、\n「私はこの方法で成長できる」を理解することです。",
+        timeInfo: "⏱️ 約5分で十分です。\n今、あなたの気質の流れを確認してください。",
+        modalTitle: "詳細説明",
+        typeExpressive: "表現型",
+        typeDriving: "推進型",
+        typeReflective: "内省型",
+        typeStable: "安定型"
+    },
+    vi: {
+        navTitle: "Bài Kiểm Tra Tính Cách",
+        currentLang: "Tiếng Việt",
+        testTag: "✨ Bài Kiểm Tra Tâm Lý",
+        mainTitle: "Bài Kiểm Tra Tính Cách",
+        subtitle: "Khám phá tính cách ẩn của bạn",
+        startButton: "Bắt Đầu Kiểm Tra",
+        question: "Câu Hỏi",
+        prevQuestion: "← Câu Hỏi Trước",
+        resultTitle: "Kết Quả Kiểm Tra Tính Cách",
+        temperamentType: "Loại Tính Cách",
+        scoreDetails: "Điểm Theo Loại",
+        viewDetails: "Xem Phân Tích Của Tôi",
+        restart: "Làm Lại",
+        testIntro: "Bài kiểm tra này",
+        testIntroDesc: "không phải là một bài phân loại tính cách đơn giản.\nĐây là công cụ để hiểu cách bạn trao đổi năng lượng với thế giới,\ncách bạn đưa ra quyết định, hành động và hình thành mối quan hệ—dòng tính cách của bạn.",
+        modelOrigin: "Nguồn Gốc Mô Hình Tính Cách",
+        modelOriginDesc: "Mô hình này dựa trên lý thuyết bốn tính cách cổ xưa:\nđa cảm, nóng nảy, u sầu và điềm tĩnh.\nTuy nhiên, chúng tôi đã rời xa những tên gọi lỗi thời và cách giải thích cứng nhắc,\ntái cấu trúc nó bằng ngôn ngữ hiện đại: Biểu Cảm, Thúc Đẩy, Suy Tư và Ổn Định.",
+        allHaveFour: "Mọi Người Đều Có Bốn Tính Cách",
+        allHaveFourDesc: "Mọi người đều sở hữu bốn yếu tố tính cách.\nSự khác biệt không phải là 'có hay không có',\nmà là tính cách nào hoạt động thường xuyên và mạnh mẽ hơn.",
+        testMethod: "Phương Pháp Kiểm Tra",
+        testMethodDesc: "Thông qua 40 câu hỏi,\nbài kiểm tra này phân tích sự kết hợp tính cách xuất hiện tự nhiên nhất trong bạn,\nvà trình bày kết quả như một trong 12 loại tính cách.",
+        testMethodTip: "💡 Vui lòng chọn câu nói mà bạn cảm thấy gần gũi nhất.",
+        detailedResult: "Kết Quả Chi Tiết",
+        detailedResultDesc: "Kết quả bao gồm không chỉ tên loại,\nmà còn điểm mạnh, lưu ý, phong cách quan hệ, công việc và phong cách học tập,\nvà hướng phát triển của bạn.",
+        testPurpose: "Mục Đích Của Bài Kiểm Tra",
+        testPurposeDesc: "Mục đích không phải là xác định\n\"Tôi là loại người này\",\nmà là hiểu \"Tôi có thể phát triển theo cách này\".",
+        timeInfo: "⏱️ Mất khoảng 5 phút.\nKiểm tra dòng tính cách của bạn ngay bây giờ.",
+        modalTitle: "Mô Tả Chi Tiết",
+        typeExpressive: "Biểu Cảm",
+        typeDriving: "Thúc Đẩy",
+        typeReflective: "Suy Tư",
+        typeStable: "Ổn Định"
+    },
+    th: {
+        navTitle: "แบบทดสอบประเภทอารมณ์",
+        currentLang: "ไทย",
+        testTag: "✨ แบบทดสอบจิตวิทยา",
+        mainTitle: "แบบทดสอบประเภทอารมณ์",
+        subtitle: "ค้นพบอารมณ์ที่ซ่อนอยู่ของคุณ",
+        startButton: "เริ่มทำแบบทดสอบ",
+        question: "คำถาม",
+        prevQuestion: "← คำถามก่อนหน้า",
+        resultTitle: "ผลการทดสอบประเภทอารมณ์",
+        temperamentType: "ประเภทอารมณ์",
+        scoreDetails: "คะแนนตามประเภท",
+        viewDetails: "ดูการวิเคราะห์ของฉัน",
+        restart: "ทำใหม่",
+        testIntro: "แบบทดสอบนี้",
+        testIntroDesc: "ไม่ใช่การจำแนกบุคลิกภาพแบบง่ายๆ\nเป็นเครื่องมือเพื่อทำความเข้าใจวิธีที่คุณแลกเปลี่ยนพลังงานกับโลก\nวิธีที่คุณตัดสินใจ กระทำ และสร้างความสัมพันธ์—การไหลของอารมณ์ของคุณ",
+        modelOrigin: "ที่มาของแบบจำลองอารมณ์",
+        modelOriginDesc: "แบบจำลองนี้อิงตามทฤษฎีอารมณ์สี่ประเภทโบราณ:\nเลือดร้อน ใจร้อน เศร้าโศก และเยือกเย็น\nอย่างไรก็ตาม เราได้ห่างไกลจากชื่อที่ล้าสมัยและการตีความที่เข้มงวด\nสร้างใหม่ด้วยภาษาสมัยใหม่: แสดงออก ขับเคลื่อน ไตร่ตรอง และมั่นคง",
+        allHaveFour: "ทุกคนมีอารมณ์ทั้งสี่ประเภท",
+        allHaveFourDesc: "ทุกคนมีองค์ประกอบอารมณ์ทั้งสี่ประเภท\nความแตกต่างไม่ใช่ 'มีหรือไม่มี'\nแต่อารมณ์ใดที่ทำงานบ่อยและเข้มข้นกว่า",
+        testMethod: "วิธีการทดสอบ",
+        testMethodDesc: "ผ่าน 40 คำถาม\nแบบทดสอบนี้วิเคราะห์การรวมกันของอารมณ์ที่ปรากฏตามธรรมชาติในตัวคุณมากที่สุด\nและนำเสนอผลลัพธ์เป็นหนึ่งใน 12 ประเภทอารมณ์",
+        testMethodTip: "💡 กรุณาเลือกข้อความที่คุณรู้สึกใกล้เคียงที่สุด",
+        detailedResult: "ผลลัพธ์โดยละเอียด",
+        detailedResultDesc: "ผลลัพธ์รวมไม่เพียงแค่ชื่อประเภท\nแต่ยังรวมถึงจุดแข็ง ข้อควรระวัง สไตล์ความสัมพันธ์ งานและสไตล์การเรียนรู้\nและทิศทางการเติบโตของคุณ",
+        testPurpose: "จุดประสงค์ของการทดสอบ",
+        testPurposeDesc: "จุดประสงค์ไม่ใช่เพื่อกำหนด\n\"ฉันเป็นคนประเภทนี้\"\nแต่เพื่อเข้าใจ \"ฉันสามารถเติบโตในวิธีนี้\"",
+        timeInfo: "⏱️ ใช้เวลาประมาณ 5 นาที\nตรวจสอบการไหลของอารมณ์ของคุณตอนนี้",
+        modalTitle: "คำอธิบายโดยละเอียด",
+        typeExpressive: "แสดงออก",
+        typeDriving: "ขับเคลื่อน",
+        typeReflective: "ไตร่ตรอง",
+        typeStable: "มั่นคง"
+    }
+};
+
+// 언어 변경 함수
+function changeLanguage(lang) {
+    currentLanguage = lang;
+    const t = translations[lang];
+    if (!t) return;
+    
+    // 네비게이션 업데이트
+    const navTitle = document.getElementById('nav-title');
+    if (navTitle) navTitle.textContent = t.navTitle;
+    
+    const currentLangEl = document.getElementById('current-lang');
+    if (currentLangEl) currentLangEl.textContent = t.currentLang;
+    
+    // 모든 화면 업데이트
+    updateAllScreens();
+    
+    // 언어 메뉴 닫기
+    const langMenu = document.getElementById('lang-menu');
+    if (langMenu) langMenu.classList.add('hidden');
+    
+    // 로컬 스토리지에 저장
+    localStorage.setItem('preferredLanguage', lang);
+    
+    // HTML lang 속성 업데이트
+    document.documentElement.lang = lang;
+}
+
+// 언어 메뉴 토글
+function toggleLanguageMenu() {
+    const menu = document.getElementById('lang-menu');
+    menu.classList.toggle('hidden');
+}
+
+// 외부 클릭 시 메뉴 닫기
+document.addEventListener('click', (e) => {
+    const langButton = document.getElementById('lang-button');
+    const langMenu = document.getElementById('lang-menu');
+    if (langButton && langMenu && !langButton.contains(e.target) && !langMenu.contains(e.target)) {
+        langMenu.classList.add('hidden');
+    }
+});
+
+// 시작 화면 업데이트
+function updateStartScreen(t) {
+    // Hero 섹션
+    const testTag = document.querySelector('#start-screen .rounded-full span');
+    if (testTag) testTag.textContent = t.testTag;
+    
+    const mainTitle = document.querySelector('#start-screen h1 span');
+    if (mainTitle) mainTitle.textContent = t.mainTitle;
+    
+    const subtitle = document.querySelector('#start-screen p.text-slate-600');
+    if (subtitle) subtitle.textContent = t.subtitle;
+    
+    // 카드 내용 업데이트
+    const cards = document.querySelectorAll('#start-screen .bg-gradient-to-br');
+    if (cards.length >= 6) {
+        // 첫 번째 카드
+        const card1Title = cards[0].querySelector('h3');
+        const card1Desc = cards[0].querySelector('p');
+        if (card1Title) card1Title.textContent = t.testIntro;
+        if (card1Desc) card1Desc.innerHTML = t.testIntroDesc.replace(/\n/g, '<br>');
+        
+        // 두 번째 카드
+        const card2Title = cards[1].querySelector('h3');
+        const card2Desc = cards[1].querySelector('p');
+        if (card2Title) card2Title.textContent = t.modelOrigin;
+        if (card2Desc) card2Desc.innerHTML = t.modelOriginDesc.replace(/\n/g, '<br>');
+        
+        // 세 번째 카드
+        const card3Title = cards[2].querySelector('h3');
+        const card3Desc = cards[2].querySelector('p');
+        if (card3Title) card3Title.textContent = t.allHaveFour;
+        if (card3Desc) card3Desc.innerHTML = t.allHaveFourDesc.replace(/\n/g, '<br>');
+        
+        // 네 번째 카드
+        const card4Title = cards[3].querySelector('h3');
+        const card4Desc = cards[3].querySelector('p');
+        const card4Tip = cards[3].querySelector('.bg-white\\/60 strong');
+        if (card4Title) card4Title.textContent = t.testMethod;
+        if (card4Desc) card4Desc.innerHTML = t.testMethodDesc.replace(/\n/g, '<br>');
+        if (card4Tip) card4Tip.textContent = t.testMethodTip.replace('💡 ', '');
+        
+        // 다섯 번째 카드
+        const card5Title = cards[4].querySelector('h3');
+        const card5Desc = cards[4].querySelector('p');
+        if (card5Title) card5Title.textContent = t.detailedResult;
+        if (card5Desc) card5Desc.innerHTML = t.detailedResultDesc.replace(/\n/g, '<br>');
+        
+        // 여섯 번째 카드
+        const card6Title = cards[5].querySelector('h3');
+        const card6Desc = cards[5].querySelector('p');
+        if (card6Title) card6Title.textContent = t.testPurpose;
+        if (card6Desc) card6Desc.innerHTML = t.testPurposeDesc.replace(/\n/g, '<br>');
+    }
+    
+    // 시간 안내
+    const timeInfo = document.querySelector('#start-screen .bg-gradient-to-r.from-slate-50');
+    if (timeInfo) timeInfo.innerHTML = t.timeInfo.replace(/\n/g, '<br>');
+    
+    // 시작 버튼
+    const startButton = document.querySelector('button[onclick="startTest()"]');
+    if (startButton) startButton.textContent = t.startButton;
+}
+
+// 모든 화면 업데이트
+function updateAllScreens() {
+    const t = translations[currentLanguage];
+    if (!t) return;
+    
+    updateStartScreen(t);
+    
+    // 퀴즈 화면
+    const questionLabel = document.getElementById('question-label');
+    if (questionLabel) questionLabel.textContent = t.question;
+    
+    const prevQuestionText = document.getElementById('prev-question-text');
+    if (prevQuestionText) prevQuestionText.textContent = t.prevQuestion;
+    
+    // 결과 화면
+    const resultTitle = document.getElementById('result-title');
+    if (resultTitle) resultTitle.textContent = t.resultTitle;
+    
+    const scoreDetailsLabel = document.getElementById('score-details-label');
+    if (scoreDetailsLabel) scoreDetailsLabel.textContent = t.scoreDetails;
+    
+    const viewDetailsText = document.getElementById('view-details-text');
+    if (viewDetailsText) viewDetailsText.textContent = t.viewDetails;
+    
+    const restartText = document.getElementById('restart-text');
+    if (restartText) restartText.textContent = t.restart;
+}
+
+// 페이지 로드 시 저장된 언어 불러오기
+document.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem('preferredLanguage') || 'ko';
+    if (savedLang !== 'ko') {
+        changeLanguage(savedLang);
+    }
+});
