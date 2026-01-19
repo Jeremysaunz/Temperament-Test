@@ -604,12 +604,34 @@ function formatSectionContent(content) {
         // 문단 시작
         let paragraphHtml = '<p class="mb-5 leading-7 text-slate-700">';
         
-        // 번호가 있는 항목 강조 (첫째, 둘째, 셋째 등)
-        para = para.replace(/(첫째|둘째|셋째|넷째|다섯째)[는은]?\s*([^\.]+?)(?=\.|$|둘째|셋째|넷째|다섯째|첫째)/g, 
-            '<span class="inline-block my-2 px-3 py-1 bg-purple-100 text-purple-700 font-bold rounded-md">$1</span>는 <span class="text-slate-800">$2</span>');
+        // 순수 텍스트만 처리하기 위해 HTML 태그를 임시로 마스킹
+        const tagPlaceholders = [];
+        let processedPara = para;
+        let placeholderIndex = 0;
         
-        // 인용구 강조 ("..." 형식)
-        para = para.replace(/"([^"]+)"/g, 
+        // HTML 태그를 임시로 치환
+        processedPara = processedPara.replace(/<[^>]+>/g, (match) => {
+            const placeholder = `__HTML_TAG_${placeholderIndex}__`;
+            tagPlaceholders[placeholderIndex] = match;
+            placeholderIndex++;
+            return placeholder;
+        });
+        
+        // 번호 항목 패턴: "첫째," 또는 "첫째는" 또는 "첫째 " 또는 "첫째."
+        processedPara = processedPara.replace(/(첫째|둘째|셋째|넷째|다섯째)([는은,]|\.|,| )/g, (match, number, suffix) => {
+            let html = `<span class="inline-block my-2 px-3 py-1 bg-purple-100 text-purple-700 font-bold rounded-md">${number}</span>`;
+            if (suffix === ',' || suffix === '.') {
+                html += suffix;
+            } else if (suffix === '는' || suffix === '은') {
+                html += suffix;
+            } else {
+                html += '는 ';
+            }
+            return html;
+        });
+        
+        // 인용구 강조 ("..." 형식) - 이미 HTML 태그가 아닌 텍스트만
+        processedPara = processedPara.replace(/"([^"]+)"/g, 
             '<span class="text-purple-600 font-semibold italic bg-purple-50 px-1 rounded">"$1"</span>');
         
         // 중요한 문구 강조
@@ -620,15 +642,22 @@ function formatSectionContent(content) {
             '강점', '역동성', '추진력', '에너지', '성장', '관리 전략'
         ];
         
+        // 중요한 문구 강조 (HTML 태그가 아닌 텍스트만)
         importantPhrases.forEach(phrase => {
-            const regex = new RegExp(`(${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'g');
-            para = para.replace(regex, '<span class="text-orange-600 font-semibold">$1</span>');
+            const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escapedPhrase})`, 'g');
+            processedPara = processedPara.replace(regex, '<span class="text-orange-600 font-semibold">$1</span>');
+        });
+        
+        // 임시로 치환한 HTML 태그를 다시 복원
+        tagPlaceholders.forEach((tag, index) => {
+            processedPara = processedPara.replace(`__HTML_TAG_${index}__`, tag);
         });
         
         // 줄바꿈 처리
-        para = para.replace(/\n/g, '<br>');
+        processedPara = processedPara.replace(/\n/g, '<br>');
         
-        paragraphHtml += para;
+        paragraphHtml += processedPara;
         paragraphHtml += '</p>';
         
         result += paragraphHtml;
