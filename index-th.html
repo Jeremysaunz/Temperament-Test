@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="th">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>기질유형테스트</title>
+    <meta name="viewport" content="width=device-width, initial-scale=10">
+    <title>แบบทดสอบประเภทอารมณ์</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="temperament_type.ico">
-    <link rel="shortcut icon" type="image/x-icon" href="temperament_type.ico">
+    <link rel="icon" type="image/x-icon" href="temperament_typeico">
+    <link rel="shortcut icon" type="image/x-icon" href="temperament_typeico">
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdntailwindcsscom"></script>
     <script>
-        tailwind.config = {
+        tailwindconfig = {
             theme: {
                 extend: {
                     colors: {
@@ -52,7 +52,7 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="stylescss">
 </head>
 
 <body class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4 bg-gradient-to-br from-slate-50 to-slate-100">
@@ -62,56 +62,56 @@
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
                     <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9663 17h4673M12 3v1m6364 1636l-707707M21 12h-1M4 12H3m3343-5657l-707-707m2828 99a5 5 0 117072 0l-548547A3374 3374 0 0014 18469V19a2 2 0 11-4 0v-531c0-895-356-1754-988-2386l-548-547z" />
                     </svg>
                 </div>
-                <span id="nav-title" class="text-sm sm:text-base font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">기질유형테스트</span>
+                <span id="nav-title" class="text-sm sm:text-base font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">แบบทดสอบประเภทอารมณ์</span>
             </div>
             
             <!-- Language Selector (16personalities style) -->
             <div class="relative z-[100]">
-                <button id="lang-button" onclick="toggleLanguageMenu()" class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 text-slate-700 hover:text-purple-600 hover:bg-slate-50 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium" type="button">
-                    <span id="current-flag" class="text-base sm:text-lg">🇰🇷</span>
-                    <span id="current-lang-code" class="font-semibold">KO</span>
+                <button id="lang-button" onclick="toggleLanguageMenu()" class="flex items-center gap-15 sm:gap-2 px-25 sm:px-3 py-15 sm:py-2 text-slate-700 hover:text-purple-600 hover:bg-slate-50 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium">
+                    <span id="current-flag" class="text-base sm:text-lg">🇹🇭</span>
+                    <span id="current-lang-code" class="font-semibold">TH</span>
                     <svg id="lang-arrow" class="w-3 h-3 text-slate-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
                 
                 <!-- Language Dropdown Menu -->
-                <div id="lang-menu" class="hidden absolute right-0 mt-1.5 w-36 sm:w-40 bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden z-[100] animate-fadeIn">
+                <div id="lang-menu" class="hidden absolute right-0 mt-15 w-36 sm:w-40 bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden z-[100] animate-fadeIn">
                     <div class="py-1">
-                        <a href="index.html" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="ko">
+                        <a href="indexhtml" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="ko">
                             <span class="text-base">🇰🇷</span>
                             <span class="font-medium text-slate-700 group-hover:text-purple-600 flex-1">한국어</span>
                             <span class="text-xs text-slate-400 font-mono">KO</span>
                         </a>
-                        <a href="index-en.html" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="en">
-                            <span class="text-base">🇺🇸</span>
+                        <a href="index-enhtml" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="en">
+                            <span class="text-base">🇹🇭</span>
                             <span class="font-medium text-slate-700 group-hover:text-purple-600 flex-1">English</span>
-                            <span class="text-xs text-slate-400 font-mono">EN</span>
+                            <span class="text-xs text-slate-400 font-mono">TH</span>
                         </a>
-                        <a href="index-es.html" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="es">
+                        <a href="index-eshtml" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="es">
                             <span class="text-base">🇪🇸</span>
                             <span class="font-medium text-slate-700 group-hover:text-purple-600 flex-1">Español</span>
                             <span class="text-xs text-slate-400 font-mono">ES</span>
                         </a>
-                        <a href="index-fr.html" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="fr">
+                        <a href="index-frhtml" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="fr">
                             <span class="text-base">🇫🇷</span>
                             <span class="font-medium text-slate-700 group-hover:text-purple-600 flex-1">Français</span>
                             <span class="text-xs text-slate-400 font-mono">FR</span>
                         </a>
-                        <a href="index-ja.html" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="ja">
+                        <a href="index-jahtml" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="ja">
                             <span class="text-base">🇯🇵</span>
                             <span class="font-medium text-slate-700 group-hover:text-purple-600 flex-1">日本語</span>
                             <span class="text-xs text-slate-400 font-mono">JA</span>
                         </a>
-                        <a href="index-vi.html" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="vi">
+                        <a href="index-vihtml" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="vi">
                             <span class="text-base">🇻🇳</span>
                             <span class="font-medium text-slate-700 group-hover:text-purple-600 flex-1">Tiếng Việt</span>
                             <span class="text-xs text-slate-400 font-mono">VI</span>
                         </a>
-                        <a href="index-th.html" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="th">
+                        <a href="index-thhtml" class="lang-option w-full px-3 sm:px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors duration-150 flex items-center gap-2 group" data-lang="th">
                             <span class="text-base">🇹🇭</span>
                             <span class="font-medium text-slate-700 group-hover:text-purple-600 flex-1">ไทย</span>
                             <span class="text-xs text-slate-400 font-mono">TH</span>
@@ -139,13 +139,13 @@
                 
                 <!-- 중앙 콘텐츠 -->
                 <div class="relative z-10">
-                    <span class="inline-block px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold text-purple-600 bg-white/80 backdrop-blur-sm rounded-full mb-4 sm:mb-5 shadow-sm">✨ 심리 테스트</span>
+                    <span class="inline-block px-3 sm:px-4 py-1 sm:py-15 text-xs sm:text-sm font-semibold text-purple-600 bg-white/80 backdrop-blur-sm rounded-full mb-4 sm:mb-5 shadow-sm">✨ แบบทดสอบจิตวิทยา</span>
                     <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
                         <span class="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                            기질유형테스트
+                            แบบทดสอบประเภทอารมณ์
                         </span>
                     </h1>
-                    <p class="text-base sm:text-lg text-slate-600 font-medium mb-4 sm:mb-5">나의 숨겨진 기질을 알아보세요</p>
+                    <p class="text-base sm:text-lg text-slate-600 font-medium mb-4 sm:mb-5">ค้นพบอารมณ์ที่ซ่อนอยู่ของคุณ</p>
                     
                     <!-- 일러스트레이션 스타일 아이콘 -->
                     <div class="flex justify-center items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
@@ -156,12 +156,12 @@
                         </div>
                         <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
                             <svg class="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9663 17h4673M12 3v1m6364 1636l-707707M21 12h-1M4 12H3m3343-5657l-707-707m2828 99a5 5 0 117072 0l-548547A3374 3374 0 0014 18469V19a2 2 0 11-4 0v-531c0-895-356-1754-988-2386l-548-547z" />
                             </svg>
                         </div>
                         <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
                             <svg class="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4318 6318a45 45 0 000 6364L12 20364l7682-7682a45 45 0 00-6364-6364L12 7636l-1318-1318a45 45 0 00-6364 0z" />
                             </svg>
                         </div>
                     </div>
@@ -177,11 +177,11 @@
                             💫
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">이 테스트는</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">แบบทดสอบนี้</h3>
                             <p class="text-sm sm:text-base leading-relaxed text-slate-700">
-                                당신의 성격을 단순히 분류하기 위한 검사가 아닙니다.<br>
-                                당신이 세상과 에너지를 주고받는 방식,<br>
-                                결정하고 행동하며 관계를 맺는 <span class="text-purple-600 font-semibold">기질의 흐름</span>을 이해하기 위한 도구입니다.
+                                ไม่ใช่การจำแนกบุคลิกภาพแบบง่ายๆ<br>
+                                เป็นเครื่องมือเพื่อทำความเข้าใจวิธีที่คุณแลกเปลี่ยนพลังงานกับโลก<br>
+                                วิธีที่คุณตัดสินใจ กระทำ และสร้างความสัมพันธ์—การไหลของอารมณ์ของคุณ <span class="text-purple-600 font-semibold"></span>
                             </p>
                         </div>
                     </div>
@@ -194,12 +194,12 @@
                             📚
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">기질 모델의 기원</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">ที่มาของแบบจำลองอารมณ์</h3>
                             <p class="text-sm sm:text-base leading-relaxed text-slate-700">
-                                이 기질 모델은 고대부터 이어져 온<br>
-                                <span class="text-blue-600 font-semibold">다혈질, 담즙질, 우울질, 점액질</span>의 4기질 이론을 바탕으로 합니다.<br>
-                                다만 시대에 맞지 않는 명칭과 고정적인 해석에서 벗어나,<br>
-                                이를 <span class="text-blue-600 font-semibold">표현, 추진, 성찰, 안정</span>이라는 현대적 언어로 재구성했습니다.
+                                แบบจำลองนี้อิงตามทฤษฎีอารมณ์สี่ประเภทโบราณ:<br>
+                                <span class="text-blue-600 font-semibold">เลือดร้อน ใจร้อน เศร้าโศก และเยือกเย็น</span><br>
+                                อย่างไรก็ตาม เราได้ห่างไกลจากชื่อที่ล้าสมัยและการตีความที่เข้มงวด<br>
+                                สร้างใหม่ด้วยภาษาสมัยใหม่: <span class="text-blue-600 font-semibold">แสดงออก ขับเคลื่อน ไตร่ตรอง และมั่นคง</span>
                             </p>
                         </div>
                     </div>
@@ -212,11 +212,11 @@
                             🌟
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">모든 사람은 네 가지 기질을 가지고 있습니다</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">ทุกคนมีอารมณ์ทั้งสี่ประเภท</h3>
                             <p class="text-sm sm:text-base leading-relaxed text-slate-700">
-                                사람은 누구나 이 네 가지 기질 요소를 모두 가지고 있습니다.<br>
-                                차이는 <span class="text-green-600 font-semibold">'있다/없다'</span>가 아니라<br>
-                                어떤 기질이 더 자주, 더 강하게 작동하느냐에 있습니다.
+                                ทุกคนมีองค์ประกอบอารมณ์ทั้งสี่ประเภท<br>
+                                ความแตกต่างไม่ใช่ <span class="text-green-600 font-semibold">'มีหรือไม่มี'</span>,<br>
+                                แต่อารมณ์ใดที่ทำงานบ่อยและเข้มข้นกว่า
                             </p>
                         </div>
                     </div>
@@ -229,15 +229,15 @@
                             🧐
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">테스트 방법</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">วิธีการทดสอบ</h3>
                             <p class="text-sm sm:text-base leading-relaxed text-slate-700 mb-3">
-                                이 테스트는 <span class="text-orange-600 font-semibold">40개의 질문</span>을 통해<br>
-                                당신에게 가장 자연스럽게 나타나는 기질의 조합을 분석하고,<br>
-                                그 결과를 <span class="text-orange-600 font-semibold">12가지 기질 유형</span>으로 제시합니다.
+                                ผ่าน <span class="text-orange-600 font-semibold">40 questions</span>,<br>
+                                แบบทดสอบนี้วิเคราะห์การรวมกันของอารมณ์ที่ปรากฏตามธรรมชาติในตัวคุณมากที่สุด<br>
+                                และนำเสนอผลลัพธ์เป็นหนึ่งใน <span class="text-orange-600 font-semibold">12 ประเภทอารมณ์</span>
                             </p>
                             <div class="bg-white/60 rounded-lg p-3 border border-orange-200">
                                 <p class="text-xs sm:text-sm text-slate-600">
-                                    💡 <strong class="text-slate-800">가장 본인과 가깝다고 생각되는 문장을 선택해주세요.</strong>
+                                    💡 <strong class="text-slate-800">กรุณาเลือกข้อความที่คุณรู้สึกใกล้เคียงที่สุด</strong>
                                 </p>
                             </div>
                         </div>
@@ -251,11 +251,11 @@
                             🎯
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">상세한 결과 제공</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">ผลลัพธ์โดยละเอียด</h3>
                             <p class="text-sm sm:text-base leading-relaxed text-slate-700">
-                                결과는 단순한 유형 이름이 아니라<br>
-                                당신의 <span class="text-pink-600 font-semibold">강점과 주의점, 관계 방식, 일과 학습 스타일</span>,<br>
-                                그리고 앞으로의 <span class="text-pink-600 font-semibold">성장 방향</span>까지 함께 안내합니다.
+                                ผลลัพธ์รวมไม่เพียงแค่ชื่อประเภท<br>
+                                แต่ยังรวมถึง <span class="text-pink-600 font-semibold">strengths, cautions, relationship style, work and learning style</span>,<br>
+                                และ <span class="text-pink-600 font-semibold">ทิศทางการเติบโตของคุณ</span>
                             </p>
                         </div>
                     </div>
@@ -268,11 +268,11 @@
                             ✨
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">테스트의 목적</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">จุดประสงค์ของการทดสอบ</h3>
                             <p class="text-sm sm:text-base leading-relaxed text-slate-700">
-                                이 테스트의 목적은<br>
-                                <span class="text-indigo-600 font-semibold">"나는 이런 사람이다"</span>라고 규정하는 것이 아니라,<br>
-                                <span class="text-indigo-600 font-semibold">"나는 이런 방식으로 성장할 수 있다"</span>를 이해하는 데 있습니다.
+                                จุดประสงค์ไม่ใช่เพื่อกำหนด<br>
+                                <span class="text-indigo-600 font-semibold">"ฉันเป็นคนประเภทนี้"</span>,<br>
+                                แต่เพื่อเข้าใจ <span class="text-indigo-600 font-semibold">"ฉันสามารถเติบโตในวิธีนี้"</span>
                             </p>
                         </div>
                     </div>
@@ -282,18 +282,18 @@
             <!-- 시간 안내 -->
             <div class="mb-6 sm:mb-8 p-3 sm:p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg border border-slate-200">
                 <p class="text-sm sm:text-base text-slate-600">
-                    ⏱️ <span class="font-semibold text-slate-700">약 5분</span>이면 충분합니다.<br>
-                    지금, 당신의 기질 흐름을 확인해보세요.
+                    ⏱️ ใช้เวลาประมาณ <span class="font-semibold text-slate-700">5 นาที</span><br>
+                    Check your  now
                 </p>
             </div>
 
             <button onclick="startTest()"
-                class="w-full bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-bold py-3 sm:py-4 rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-[0.98] mb-4 sm:mb-6 text-sm sm:text-base">
-                테스트 시작하기
+                class="w-full bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-bold py-3 sm:py-4 rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-[098] mb-4 sm:mb-6 text-sm sm:text-base">
+                เริ่มทำแบบทดสอบ
             </button>
             
             <div class="flex justify-center mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-200">
-                <div class="px-3 py-1.5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-100 shadow-sm">
+                <div class="px-3 py-15 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-100 shadow-sm">
                     <span class="flowlab-text text-xs font-bold tracking-widest bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">FLOWLAB</span>
                 </div>
             </div>
@@ -304,88 +304,88 @@
             <!-- Header -->
             <div class="mb-6">
                 <div class="flex justify-between items-end mb-2">
-                    <span class="text-sm font-medium text-slate-400" id="question-label">Question</span>
+                    <span class="text-sm font-medium text-slate-400" id="question-label">คำถาม</span>
                     <span class="text-2xl font-bold text-slate-800" id="question-number">1<span
                             class="text-sm font-normal text-slate-400 ml-1">/ 40</span></span>
                 </div>
                 <!-- Progress Bar -->
                 <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div id="progress-bar" class="h-full bg-purple-500 progress-bar-fill rounded-full" style="width: 2.5%"></div>
+                    <div id="progress-bar" class="h-full bg-purple-500 progress-bar-fill rounded-full" style="width: 25%"></div>
                 </div>
             </div>
 
-            <!-- Question & Options -->
+            <!-- คำถาม & Options -->
             <div class="flex-1 flex flex-col justify-center fade-in" id="question-container">
                 <!-- Dynamic Content Here -->
             </div>
             
             <!-- 이전 버튼 -->
             <div class="mt-4">
-                <button id="prev-button" onclick="goToPreviousQuestion()"
-                    class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-lg transition-all text-xs disabled:opacity-50 disabled:cursor-not-allowed">
-                    <span id="prev-question-text">← 이전 질문</span>
+                <button id="prev-button" onclick="goToPreviousคำถาม()"
+                    class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-25 rounded-lg transition-all text-xs disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span id="prev-question-text">← Previous คำถาม</span>
                 </button>
             </div>
             
             <!-- Logo -->
             <div class="flex justify-center mt-6 pt-6 border-t border-slate-200">
-                <div class="px-3 py-1.5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-100 shadow-sm">
+                <div class="px-3 py-15 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-100 shadow-sm">
                     <span class="flowlab-text text-xs font-bold tracking-widest bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">FLOWLAB</span>
                 </div>
             </div>
         </div>
 
         <!-- Result Screen -->
-        <div id="result-screen" class="hidden bg-white rounded-2xl text-center fade-in shadow-xl" style="max-height: calc(100vh - 1rem); overflow-y: auto; padding: 1.5rem 1rem 1rem 1rem;">
-            <h2 class="text-2xl font-bold text-slate-900 mb-5" id="result-title">기질 유형 테스트 결과</h2>
+        <div id="result-screen" class="hidden bg-white rounded-2xl text-center fade-in shadow-xl" style="max-height: calc(100vh - 1rem); overflow-y: auto; padding: 15rem 1rem 1rem 1rem;">
+            <h2 class="text-2xl font-bold text-slate-900 mb-5" id="result-title">แบบทดสอบประเภทอารมณ์ Results</h2>
 
             <!-- 조합 결과 (주기질 + 보조기질) -->
             <div class="mb-5">
                 <!-- 조합 결과 카드 -->
                 <div id="primary-card" class="p-4 rounded-xl shadow-lg text-white">
-                    <div class="text-xs font-bold text-white/90 mb-2 uppercase tracking-wider">기질 유형</div>
-                    <h3 id="result-type" class="text-lg font-bold text-white mb-2 leading-tight break-words">타입 이름</h3>
+                    <div class="text-xs font-bold text-white/90 mb-2 uppercase tracking-wider">ประเภทอารมณ์</div>
+                    <h3 id="result-type" class="text-lg font-bold text-white mb-2 leading-tight break-words">Type Name</h3>
                     <p id="result-desc" class="text-white/90 text-xs leading-relaxed line-clamp-3 break-words">
-                        여기에 결과 설명이 들어갑니다.
+                        Result description will appear here
                     </p>
                 </div>
 
                 <!-- 보조기질 카드 (숨김 처리용) -->
                 <div id="secondary-card" class="p-4 rounded-xl shadow-lg text-white hidden">
-                    <div class="text-xs font-bold text-white/90 mb-2 uppercase tracking-wider">보조 기질</div>
-                    <h3 id="sub-result-type" class="text-lg font-bold text-white mb-2 leading-tight break-words">타입 이름</h3>
+                    <div class="text-xs font-bold text-white/90 mb-2 uppercase tracking-wider">Secondary Temperament</div>
+                    <h3 id="sub-result-type" class="text-lg font-bold text-white mb-2 leading-tight break-words">Type Name</h3>
                     <p id="sub-result-desc" class="text-white/90 text-xs leading-relaxed line-clamp-3 break-words">
-                        여기에 보조 기질 설명이 들어갑니다.
+                        Secondary temperament description will appear here
                     </p>
                 </div>
             </div>
 
             <!-- 기질 유형별 점수 (컴팩트) -->
             <div class="mb-5">
-                <p class="text-sm font-bold text-slate-800 mb-3" id="score-details-label">기질 유형별 점수</p>
-                <div id="score-details" class="space-y-2.5">
+                <p class="text-sm font-bold text-slate-800 mb-3" id="score-details-label">คะแนนตามประเภท</p>
+                <div id="score-details" class="space-y-25">
                     <!-- Scores injected via JS -->
                 </div>
             </div>
 
             <!-- 버튼 -->
-            <div class="flex gap-2.5 mb-3">
+            <div class="flex gap-25 mb-3">
                 <button onclick="showDetailDescription()"
-                    class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-sm transform hover:scale-[1.02] active:scale-[0.98]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-35 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-sm transform hover:scale-[102] active:scale-[098]">
+                    <svg xmlns="http://wwww3org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="25">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9663 17h4673M12 3v1m6364 1636l-707707M21 12h-1M4 12H3m3343-5657l-707-707m2828 99a5 5 0 117072 0l-548547A3374 3374 0 0014 18469V19a2 2 0 11-4 0v-531c0-895-356-1754-988-2386l-548-547z" />
                     </svg>
-                    <span id="view-details-text">나의 성향분석 내용 보기</span>
+                    <span id="view-details-text">ดูการวิเคราะห์ของฉัน</span>
                 </button>
             <button onclick="restartTest()"
                     class="flex-1 bg-white border-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-bold py-3 rounded-xl transition-all text-xs">
-                    <span id="restart-text">다시하기</span>
+                    <span id="restart-text">ทำใหม่</span>
                 </button>
             </div>
             
             <!-- 로고 텍스트 (하단) -->
             <div class="flex justify-center pt-3 border-t border-slate-200">
-                <div class="px-3 py-1.5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-100 shadow-sm">
+                <div class="px-3 py-15 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-100 shadow-sm">
                     <span class="flowlab-text text-xs font-bold tracking-widest bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">FLOWLAB</span>
                 </div>
             </div>
@@ -394,11 +394,11 @@
 
     <!-- 상세 설명 모달 -->
     <div id="detail-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onclick="handleModalClick(event)">
-        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onclick="eventstopPropagation()">
             <div class="sticky top-0 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-slate-200 px-6 py-5 flex justify-between items-center z-10 backdrop-blur-sm">
-                <h3 id="modal-title" class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">나의 성향분석</h3>
+                <h3 id="modal-title" class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">การวิเคราะห์ของฉัน</h3>
                 <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 transition-colors p-1 hover:bg-slate-100 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://wwww3org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
             </button>
@@ -411,8 +411,8 @@
 
     <script src="script.js"></script>
     <script>
-        // Set current language to Korean
-        currentLanguage = 'ko';
+        // Set current language to Thai
+        currentLanguage = 'th';
     </script>
 </body>
 

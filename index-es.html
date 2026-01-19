@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>기질유형테스트</title>
+    <title>Test de Tipo de Temperamento</title>
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="temperament_type.ico">
     <link rel="shortcut icon" type="image/x-icon" href="temperament_type.ico">
@@ -65,14 +65,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
                 </div>
-                <span id="nav-title" class="text-sm sm:text-base font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">기질유형테스트</span>
+                <span id="nav-title" class="text-sm sm:text-base font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Test de Tipo de Temperamento</span>
             </div>
             
             <!-- Language Selector (16personalities style) -->
             <div class="relative z-[100]">
-                <button id="lang-button" onclick="toggleLanguageMenu()" class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 text-slate-700 hover:text-purple-600 hover:bg-slate-50 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium" type="button">
-                    <span id="current-flag" class="text-base sm:text-lg">🇰🇷</span>
-                    <span id="current-lang-code" class="font-semibold">KO</span>
+                <button id="lang-button" onclick="toggleLanguageMenu()" class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 text-slate-700 hover:text-purple-600 hover:bg-slate-50 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium">
+                    <span id="current-flag" class="text-base sm:text-lg">🇪🇸</span>
+                    <span id="current-lang-code" class="font-semibold">ES</span>
                     <svg id="lang-arrow" class="w-3 h-3 text-slate-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
@@ -139,13 +139,13 @@
                 
                 <!-- 중앙 콘텐츠 -->
                 <div class="relative z-10">
-                    <span class="inline-block px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold text-purple-600 bg-white/80 backdrop-blur-sm rounded-full mb-4 sm:mb-5 shadow-sm">✨ 심리 테스트</span>
+                    <span class="inline-block px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold text-purple-600 bg-white/80 backdrop-blur-sm rounded-full mb-4 sm:mb-5 shadow-sm">✨ Test Psicológico</span>
                     <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
                         <span class="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                            기질유형테스트
+                            Test de Tipo de Temperamento
                         </span>
                     </h1>
-                    <p class="text-base sm:text-lg text-slate-600 font-medium mb-4 sm:mb-5">나의 숨겨진 기질을 알아보세요</p>
+                    <p class="text-base sm:text-lg text-slate-600 font-medium mb-4 sm:mb-5">Descubre tu temperamento oculto</p>
                     
                     <!-- 일러스트레이션 스타일 아이콘 -->
                     <div class="flex justify-center items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
@@ -177,11 +177,11 @@
                             💫
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">이 테스트는</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">Este test es</h3>
                             <p class="text-sm sm:text-base leading-relaxed text-slate-700">
-                                당신의 성격을 단순히 분류하기 위한 검사가 아닙니다.<br>
-                                당신이 세상과 에너지를 주고받는 방식,<br>
-                                결정하고 행동하며 관계를 맺는 <span class="text-purple-600 font-semibold">기질의 흐름</span>을 이해하기 위한 도구입니다.
+                                no es una simple clasificación de personalidad.<br>
+                                Es una herramienta para entender cómo intercambias energía con el mundo,<br>
+                                cómo tomas decisiones, actúas y formas relaciones—tu <span class="text-purple-600 font-semibold">flujo de temperamento</span>.
                             </p>
                         </div>
                     </div>
@@ -194,12 +194,12 @@
                             📚
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">기질 모델의 기원</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">Origen del Modelo de Temperamento</h3>
                             <p class="text-sm sm:text-base leading-relaxed text-slate-700">
-                                이 기질 모델은 고대부터 이어져 온<br>
-                                <span class="text-blue-600 font-semibold">다혈질, 담즙질, 우울질, 점액질</span>의 4기질 이론을 바탕으로 합니다.<br>
-                                다만 시대에 맞지 않는 명칭과 고정적인 해석에서 벗어나,<br>
-                                이를 <span class="text-blue-600 font-semibold">표현, 추진, 성찰, 안정</span>이라는 현대적 언어로 재구성했습니다.
+                                Este modelo se basa en la antigua teoría de los cuatro temperamentos:<br>
+                                <span class="text-blue-600 font-semibold">sanguíneo, colérico, melancólico y flemático</span>.<br>
+                                Sin embargo, nos hemos alejado de nombres obsoletos e interpretaciones rígidas,<br>
+                                reconstruyéndolo con lenguaje moderno: <span class="text-blue-600 font-semibold">Expresivo, Impulsor, Reflexivo y Estable</span>.
                             </p>
                         </div>
                     </div>
@@ -212,11 +212,11 @@
                             🌟
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">모든 사람은 네 가지 기질을 가지고 있습니다</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">Todos Tienen los Cuatro Temperamentos</h3>
                             <p class="text-sm sm:text-base leading-relaxed text-slate-700">
-                                사람은 누구나 이 네 가지 기질 요소를 모두 가지고 있습니다.<br>
-                                차이는 <span class="text-green-600 font-semibold">'있다/없다'</span>가 아니라<br>
-                                어떤 기질이 더 자주, 더 강하게 작동하느냐에 있습니다.
+                                Todos poseen los cuatro elementos del temperamento.<br>
+                                La diferencia no es <span class="text-green-600 font-semibold">'tener o no tener'</span>,<br>
+                                sino qué temperamento opera con más frecuencia e intensidad.
                             </p>
                         </div>
                     </div>
@@ -229,15 +229,15 @@
                             🧐
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">테스트 방법</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">Método del Test</h3>
                             <p class="text-sm sm:text-base leading-relaxed text-slate-700 mb-3">
-                                이 테스트는 <span class="text-orange-600 font-semibold">40개의 질문</span>을 통해<br>
-                                당신에게 가장 자연스럽게 나타나는 기질의 조합을 분석하고,<br>
-                                그 결과를 <span class="text-orange-600 font-semibold">12가지 기질 유형</span>으로 제시합니다.
+                                A través de <span class="text-orange-600 font-semibold">40 preguntas</span>,<br>
+                                este test analiza la combinación de temperamentos que aparece más naturalmente en ti,<br>
+                                y presenta el resultado como uno de los <span class="text-orange-600 font-semibold">12 tipos de temperamento</span>.
                             </p>
                             <div class="bg-white/60 rounded-lg p-3 border border-orange-200">
                                 <p class="text-xs sm:text-sm text-slate-600">
-                                    💡 <strong class="text-slate-800">가장 본인과 가깝다고 생각되는 문장을 선택해주세요.</strong>
+                                    💡 <strong class="text-slate-800">Por favor selecciona la afirmación que te resuene más.</strong>
                                 </p>
                             </div>
                         </div>
@@ -251,11 +251,11 @@
                             🎯
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">상세한 결과 제공</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">Resultados Detallados</h3>
                             <p class="text-sm sm:text-base leading-relaxed text-slate-700">
-                                결과는 단순한 유형 이름이 아니라<br>
-                                당신의 <span class="text-pink-600 font-semibold">강점과 주의점, 관계 방식, 일과 학습 스타일</span>,<br>
-                                그리고 앞으로의 <span class="text-pink-600 font-semibold">성장 방향</span>까지 함께 안내합니다.
+                                Los resultados incluyen no solo un nombre de tipo,<br>
+                                sino tus <span class="text-pink-600 font-semibold">fortalezas, precauciones, estilo de relación, trabajo y estilo de aprendizaje</span>,<br>
+                                y tu <span class="text-pink-600 font-semibold">dirección de crecimiento</span>.
                             </p>
                         </div>
                     </div>
@@ -268,11 +268,11 @@
                             ✨
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">테스트의 목적</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">Propósito del Test</h3>
                             <p class="text-sm sm:text-base leading-relaxed text-slate-700">
-                                이 테스트의 목적은<br>
-                                <span class="text-indigo-600 font-semibold">"나는 이런 사람이다"</span>라고 규정하는 것이 아니라,<br>
-                                <span class="text-indigo-600 font-semibold">"나는 이런 방식으로 성장할 수 있다"</span>를 이해하는 데 있습니다.
+                                El propósito no es definir<br>
+                                <span class="text-indigo-600 font-semibold">"Soy este tipo de persona"</span>,<br>
+                                sino entender <span class="text-indigo-600 font-semibold">"Puedo crecer de esta manera"</span>.
                             </p>
                         </div>
                     </div>
@@ -282,14 +282,14 @@
             <!-- 시간 안내 -->
             <div class="mb-6 sm:mb-8 p-3 sm:p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg border border-slate-200">
                 <p class="text-sm sm:text-base text-slate-600">
-                    ⏱️ <span class="font-semibold text-slate-700">약 5분</span>이면 충분합니다.<br>
-                    지금, 당신의 기질 흐름을 확인해보세요.
+                    ⏱️ Toma aproximadamente <span class="font-semibold text-slate-700">5 minutos</span>.<br>
+                    Verifica tu flujo de temperamento ahora.
                 </p>
             </div>
 
             <button onclick="startTest()"
                 class="w-full bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-bold py-3 sm:py-4 rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-[0.98] mb-4 sm:mb-6 text-sm sm:text-base">
-                테스트 시작하기
+                Comenzar Test
             </button>
             
             <div class="flex justify-center mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-200">
@@ -304,7 +304,7 @@
             <!-- Header -->
             <div class="mb-6">
                 <div class="flex justify-between items-end mb-2">
-                    <span class="text-sm font-medium text-slate-400" id="question-label">Question</span>
+                    <span class="text-sm font-medium text-slate-400" id="question-label">Pregunta</span>
                     <span class="text-2xl font-bold text-slate-800" id="question-number">1<span
                             class="text-sm font-normal text-slate-400 ml-1">/ 40</span></span>
                 </div>
@@ -323,7 +323,7 @@
             <div class="mt-4">
                 <button id="prev-button" onclick="goToPreviousQuestion()"
                     class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-lg transition-all text-xs disabled:opacity-50 disabled:cursor-not-allowed">
-                    <span id="prev-question-text">← 이전 질문</span>
+                    <span id="prev-question-text">← Pregunta Anterior</span>
                 </button>
             </div>
             
@@ -337,32 +337,32 @@
 
         <!-- Result Screen -->
         <div id="result-screen" class="hidden bg-white rounded-2xl text-center fade-in shadow-xl" style="max-height: calc(100vh - 1rem); overflow-y: auto; padding: 1.5rem 1rem 1rem 1rem;">
-            <h2 class="text-2xl font-bold text-slate-900 mb-5" id="result-title">기질 유형 테스트 결과</h2>
+            <h2 class="text-2xl font-bold text-slate-900 mb-5" id="result-title">Resultados del Test de Temperamento</h2>
 
             <!-- 조합 결과 (주기질 + 보조기질) -->
             <div class="mb-5">
                 <!-- 조합 결과 카드 -->
                 <div id="primary-card" class="p-4 rounded-xl shadow-lg text-white">
-                    <div class="text-xs font-bold text-white/90 mb-2 uppercase tracking-wider">기질 유형</div>
-                    <h3 id="result-type" class="text-lg font-bold text-white mb-2 leading-tight break-words">타입 이름</h3>
+                    <div class="text-xs font-bold text-white/90 mb-2 uppercase tracking-wider">Tipo de Temperamento</div>
+                    <h3 id="result-type" class="text-lg font-bold text-white mb-2 leading-tight break-words">Type Name</h3>
                     <p id="result-desc" class="text-white/90 text-xs leading-relaxed line-clamp-3 break-words">
-                        여기에 결과 설명이 들어갑니다.
+                        Result description will appear here.
                     </p>
                 </div>
 
                 <!-- 보조기질 카드 (숨김 처리용) -->
                 <div id="secondary-card" class="p-4 rounded-xl shadow-lg text-white hidden">
-                    <div class="text-xs font-bold text-white/90 mb-2 uppercase tracking-wider">보조 기질</div>
-                    <h3 id="sub-result-type" class="text-lg font-bold text-white mb-2 leading-tight break-words">타입 이름</h3>
+                    <div class="text-xs font-bold text-white/90 mb-2 uppercase tracking-wider">Secondary Temperament</div>
+                    <h3 id="sub-result-type" class="text-lg font-bold text-white mb-2 leading-tight break-words">Type Name</h3>
                     <p id="sub-result-desc" class="text-white/90 text-xs leading-relaxed line-clamp-3 break-words">
-                        여기에 보조 기질 설명이 들어갑니다.
+                        Secondary temperament description will appear here.
                     </p>
                 </div>
             </div>
 
             <!-- 기질 유형별 점수 (컴팩트) -->
             <div class="mb-5">
-                <p class="text-sm font-bold text-slate-800 mb-3" id="score-details-label">기질 유형별 점수</p>
+                <p class="text-sm font-bold text-slate-800 mb-3" id="score-details-label">Puntuación por Tipo</p>
                 <div id="score-details" class="space-y-2.5">
                     <!-- Scores injected via JS -->
                 </div>
@@ -375,11 +375,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
-                    <span id="view-details-text">나의 성향분석 내용 보기</span>
+                    <span id="view-details-text">Ver Mi Análisis</span>
                 </button>
             <button onclick="restartTest()"
                     class="flex-1 bg-white border-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-bold py-3 rounded-xl transition-all text-xs">
-                    <span id="restart-text">다시하기</span>
+                    <span id="restart-text">Reiniciar</span>
                 </button>
             </div>
             
@@ -396,7 +396,7 @@
     <div id="detail-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onclick="handleModalClick(event)">
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
             <div class="sticky top-0 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-slate-200 px-6 py-5 flex justify-between items-center z-10 backdrop-blur-sm">
-                <h3 id="modal-title" class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">나의 성향분석</h3>
+                <h3 id="modal-title" class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Mi Análisis</h3>
                 <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 transition-colors p-1 hover:bg-slate-100 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -411,8 +411,8 @@
 
     <script src="script.js"></script>
     <script>
-        // Set current language to Korean
-        currentLanguage = 'ko';
+        // Set current language to Spanish
+        currentLanguage = 'es';
     </script>
 </body>
 
