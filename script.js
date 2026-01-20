@@ -62,10 +62,7 @@ const languageCodes = {
     ko: 'KO',
     en: 'EN',
     es: 'ES',
-    fr: 'FR',
-    ja: 'JA',
-    vi: 'VI',
-    th: 'TH'
+    vi: 'VI'
 };
 
 // 언어별 국기 이모지 매핑
@@ -73,10 +70,7 @@ const languageFlags = {
     ko: '🇰🇷',
     en: '🇺🇸',
     es: '🇪🇸',
-    fr: '🇫🇷',
-    ja: '🇯🇵',
-    vi: '🇻🇳',
-    th: '🇹🇭'
+    vi: '🇻🇳'
 };
 
 const startScreen = document.getElementById('start-screen');
@@ -610,20 +604,20 @@ function formatDetailContent(detail) {
         if (content) {
             const gradientColor = sectionColors[sectionTitle] || 'from-slate-500 to-slate-600';
             
-            // 내용 포맷팅 (키워드 강조, 인용구 처리)
+            // 내용 포맷팅 (플레인 텍스트)
             const formattedContent = formatSectionContent(content);
             
             html += `
-                <div class="mb-8 pb-8 border-b border-slate-100 last:border-0">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r ${gradientColor} text-white font-bold text-sm flex items-center justify-center shadow-md">
+                <div class="mb-8 pb-8 border-b border-slate-200 last:border-0">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r ${gradientColor} text-white font-bold text-sm flex items-center justify-center">
                             ${index + 1}
                         </span>
-                        <h4 class="text-xl font-bold bg-gradient-to-r ${gradientColor} bg-clip-text text-transparent">
+                        <h4 class="text-lg font-bold text-slate-800">
                             ${sectionTitle}
                         </h4>
                     </div>
-                    <div class="text-base leading-relaxed text-slate-700 ml-11 space-y-4">
+                    <div class="text-base leading-relaxed text-slate-700 ml-11">
                         ${formattedContent}
                     </div>
                 </div>
@@ -634,135 +628,27 @@ function formatDetailContent(detail) {
     return html || '<p class="text-slate-500 text-center py-8">상세 설명 내용이 없습니다.</p>';
 }
 
-// 섹션 내용 포맷팅 (키워드 강조, 인용구 처리)
+// 섹션 내용 포맷팅 (플레인 텍스트로 단순화)
 function formatSectionContent(content) {
-    // 먼저 키워드 박스 처리 (다른 포맷팅 전에)
-    let formatted = content;
+    if (!content) return '';
     
-    // 키워드 강조 (예: "핵심 키워드: 열정, 카리스마..." 형식)
-    formatted = formatted.replace(/핵심 키워드:\s*([^\n]+)/g, 
-        '<div class="my-5 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border-l-4 border-blue-400 shadow-sm"><span class="font-bold text-blue-700 text-base">핵심 키워드:</span> <span class="text-blue-600 font-semibold">$1</span></div>');
+    // HTML 태그 제거
+    let text = content.replace(/<[^>]+>/g, '');
     
     // 문단을 줄바꿈 기준으로 분리
-    const paragraphs = formatted.split(/\n\n+/).filter(p => p.trim());
+    const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
     
     let result = '';
     
-    paragraphs.forEach((para, idx) => {
+    paragraphs.forEach((para) => {
         para = para.trim();
         if (!para) return;
         
-        // 키워드 박스는 그대로 유지
-        if (para.includes('핵심 키워드:')) {
-            result += para;
-            return;
-        }
+        // 줄바꿈을 <br>로 변환
+        para = para.replace(/\n/g, '<br>');
         
-        // 문단 시작
-        let paragraphHtml = '<p class="mb-5 leading-7 text-slate-700">';
-        
-        // 순수 텍스트만 처리하기 위해 HTML 태그를 임시로 마스킹
-        const tagPlaceholders = [];
-        let processedPara = para;
-        let placeholderIndex = 0;
-        
-        // HTML 태그를 임시로 치환 (이미 생성된 태그 보호)
-        processedPara = processedPara.replace(/<[^>]+>/g, (match) => {
-            const placeholder = `__HTML_TAG_${placeholderIndex}__`;
-            tagPlaceholders[placeholderIndex] = match;
-            placeholderIndex++;
-            return placeholder;
-        });
-        
-        // 번호 항목 패턴: "첫째," 또는 "첫째는" 또는 "첫째 " 또는 "첫째."
-        // 텍스트를 부분으로 나누어서 플레이스홀더가 아닌 부분만 처리
-        const numberParts = processedPara.split(/(__HTML_TAG_\d+__)/g);
-        let numberProcessed = '';
-        
-        numberParts.forEach(part => {
-            if (part.match(/^__HTML_TAG_\d+__$/)) {
-                // 플레이스홀더는 그대로 유지
-                numberProcessed += part;
-            } else {
-                // 순수 텍스트 부분만 번호 항목 처리
-                part = part.replace(/(첫째|둘째|셋째|넷째|다섯째)([는은,]|\.|,| )/g, (match, number, suffix) => {
-                    let html = `<span class="inline-block my-2 px-3 py-1 bg-purple-100 text-purple-700 font-bold rounded-md">${number}</span>`;
-                    if (suffix === ',' || suffix === '.') {
-                        html += suffix;
-                    } else if (suffix === '는' || suffix === '은') {
-                        html += suffix;
-                    } else {
-                        html += '는 ';
-                    }
-                    return html;
-                });
-                numberProcessed += part;
-            }
-        });
-        
-        processedPara = numberProcessed;
-        
-        // 인용구 강조 ("..." 형식) - 플레이스홀더가 아닌 텍스트만
-        const quoteParts = processedPara.split(/(__HTML_TAG_\d+__)/g);
-        let quoteProcessed = '';
-        
-        quoteParts.forEach(part => {
-            if (part.match(/^__HTML_TAG_\d+__$/)) {
-                // 플레이스홀더는 그대로 유지
-                quoteProcessed += part;
-            } else {
-                // 순수 텍스트 부분만 인용구 처리
-                part = part.replace(/"([^"]+)"/g, 
-                    '<span class="text-purple-600 font-semibold italic bg-purple-50 px-1 rounded">"$1"</span>');
-                quoteProcessed += part;
-            }
-        });
-        
-        processedPara = quoteProcessed;
-        
-        // 중요한 문구 강조
-        const importantPhrases = [
-            '빠르고 강하게', '0에서 1', '일단 시작하고 보자', '열정적으로 말하고', 
-            '과감하게 행동하는', '강력한 추진력', '폭발적인 에너지', '카리스마',
-            '타고난 능력', '진정한 리더', '핵심', '본질', '중요한', '가장 빛나는',
-            '강점', '역동성', '추진력', '에너지', '성장', '관리 전략'
-        ];
-        
-        // 중요한 문구 강조 (플레이스홀더가 아닌 텍스트만)
-        // 텍스트를 부분으로 나누어서 처리
-        const parts = processedPara.split(/(__HTML_TAG_\d+__)/g);
-        let finalPara = '';
-        
-        parts.forEach(part => {
-            if (part.match(/^__HTML_TAG_\d+__$/)) {
-                // 플레이스홀더는 그대로 유지
-                finalPara += part;
-            } else {
-                // 순수 텍스트 부분만 강조 처리
-                let text = part;
-                importantPhrases.forEach(phrase => {
-                    const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    const regex = new RegExp(`(${escapedPhrase})`, 'g');
-                    text = text.replace(regex, '<span class="text-orange-600 font-semibold">$1</span>');
-                });
-                finalPara += text;
-            }
-        });
-        
-        processedPara = finalPara;
-        
-        // 임시로 치환한 HTML 태그를 다시 복원
-        tagPlaceholders.forEach((tag, index) => {
-            processedPara = processedPara.replace(`__HTML_TAG_${index}__`, tag);
-        });
-        
-        // 줄바꿈 처리
-        processedPara = processedPara.replace(/\n/g, '<br>');
-        
-        paragraphHtml += processedPara;
-        paragraphHtml += '</p>';
-        
-        result += paragraphHtml;
+        // 문단을 <p> 태그로 감싸기
+        result += `<p class="mb-4 leading-7 text-slate-700">${para}</p>`;
     });
     
     return result;
@@ -1029,174 +915,6 @@ const translations = {
         typeReflective: "Reflexivo",
         typeStable: "Estable"
     },
-    fr: {
-        // 질문 데이터
-        questions: [
-            { q: 1, options: ["Je me sens facilement énergisé par de nouvelles personnes ou situations", "Je suis relativement ouvert aux nouveaux défis", "J'ai tendance à analyser et comprendre les situations", "J'ai tendance à m'adapter flexiblement aux situations"] },
-            { q: 2, options: ["J'ai tendance à égayer l'atmosphère", "J'essaie de transmettre mes opinions de manière persuasive", "Une fois que je commence quelque chose, je vais jusqu'au bout", "Je n'ai pas de grandes fluctuations émotionnelles"] },
-            { q: 3, options: ["Je gagne de la force en étant avec les gens", "Quand j'ai un objectif, je le poursuis avec force", "Je renonce souvent à mes propres choses pour les autres", "Je m'adapte relativement bien aux environnements donnés"] },
-            { q: 4, options: ["J'ai tendance à faire une bonne première impression", "Je me sens motivé dans les situations compétitives", "Je suis bon pour comprendre les sentiments ou positions des gens", "J'ai tendance à garder les émotions à l'intérieur plutôt que de les montrer"] },
-            { q: 5, options: ["J'aime trouver de nouvelles idées", "Je suis évalué comme ayant d'excellentes compétences en résolution de problèmes", "Je valorise le respect des autres", "J'ai tendance à être prudent dans les nouvelles situations"] },
-            { q: 6, options: ["Je me sens bien dans les situations actives", "Je préfère décider et agir seul", "Je suis sensible aux changements émotionnels", "J'ai tendance à bien accepter les opinions des autres"] },
-            { q: 7, options: ["Je prends souvent naturellement le leadership", "J'essaie d'interpréter les situations positivement", "Je valorise la création et le suivi de plans", "Je suis relativement patient"] },
-            { q: 8, options: ["J'ai tendance à réagir et agir immédiatement", "J'ai confiance en mes choix", "Je trouve confortable de suivre des procédures ou plans établis", "Je ne suis pas très bavard"] },
-            { q: 9, options: ["J'ai généralement une perspective optimiste", "J'exprime mes pensées et sentiments relativement honnêtement", "Je valorise l'organisation et les systèmes", "J'ai tendance à embrasser des personnes diverses"] },
-            { q: 10, options: ["Je suis bon pour raconter des histoires de manière intéressante", "J'ai des standards et perspectives clairs", "Je suis considéré comme une personne digne de confiance", "J'ai une attitude gentille et attentionnée"] },
-            { q: 11, options: ["Je trouve de la joie dans la vie", "Je peux être audacieux même dans des situations risquées", "Je prête attention aux détails", "Je coordonne en douceur dans les relations"] },
-            { q: 12, options: ["Mes expressions et ton sont brillants", "J'ai une confiance en soi relativement forte", "Je valorise la dignité et la courtoisie", "Je préfère les états stables"] },
-            { q: 13, options: ["Je suis facilement motivé par des stimuli externes", "J'ai tendance à juger et agir indépendamment", "Je valorise les valeurs et significations idéales", "Je donne une impression douce et douce"] },
-            { q: 14, options: ["Je suis familier avec l'expression de mes pensées", "Je suis rapide pour prendre des décisions", "J'ai tendance à m'immerger profondément dans une chose", "J'utilise la sérieux et l'humour ensemble"] },
-            { q: 15, options: ["Je m'adapte relativement facilement aux nouveaux rassemblements", "Je suggère fréquemment des idées ou opinions", "J'apprécie les activités artistiques, musicales et émotionnelles", "Je joue un rôle de médiation dans les conflits"] },
-            { q: 16, options: ["J'aime communiquer par des mots", "Je valorise les résultats et les résultats", "J'ai tendance à réfléchir à fond avant de décider", "Je suis tolérant envers les erreurs des autres"] },
-            { q: 17, options: ["Mes émotions et passion sont relativement claires", "Je me sens responsable des tâches que j'assume", "Je valorise la confiance et la loyauté dans les relations", "J'écoute bien les histoires des autres"] },
-            { q: 18, options: ["Je ne me sens pas accablé d'être devant les gens", "Je prends souvent des rôles de leadership", "Je valorise l'organisation et la structure", "Je suis satisfait de l'état actuel"] },
-            { q: 19, options: ["J'ai tendance à devenir bien connu parmi les gens", "J'insiste sur l'efficacité et la productivité", "J'ai tendance à viser une haute finalisation", "Je poursuis le confort et la stabilité"] },
-            { q: 20, options: ["Mon énergie se montre extérieurement bien", "Je réponds calmement même dans des situations difficiles", "Je valorise la courtoisie et les règles", "Je préfère le juste milieu plutôt que les extrêmes"] },
-            { q: 21, options: ["Je veux parfois être remarqué", "Je montre une tendance à diriger ou contrôler", "Je peux rétrécir dans des situations inconnues", "J'ai tendance à m'évader quand la motivation baisse"] },
-            { q: 22, options: ["J'ai parfois des difficultés à contrôler les émotions", "J'essaie de ne pas être influencé par les émotions", "Je me souviens des blessures pendant longtemps", "Ma passion peut sembler faible"] },
-            { q: 23, options: ["Mes explications peuvent devenir longues", "Je veux parfois défier l'autorité", "J'ai tendance à garder les émotions refoulées", "Je remets parfois à plus tard les choses que je dois faire"] },
-            { q: 24, options: ["J'oublie souvent des choses", "Je suis parfois mal compris à cause de mon honnêteté", "Mes standards peuvent sembler trop élevés et pointilleux", "L'inquiétude vient souvent en premier"] },
-            { q: 25, options: ["J'interromps parfois pendant les conversations", "J'ai tendance à précipiter les décisions", "Mes fluctuations émotionnelles peuvent être importantes", "J'ai tendance à hésiter sur les décisions"] },
-            { q: 26, options: ["Mes modèles de comportement peuvent être difficiles à prédire", "Je peux être maladroit à exprimer des émotions", "Je peux sentir que ma présence est faible dans les relations", "Je ne suis parfois pas proactif dans la formation de relations"] },
-            { q: 27, options: ["Je suis parfois le flux spontanément", "Je ne change pas facilement mes pensées", "J'ai tendance à accumuler l'insatisfaction à l'intérieur", "Je passe beaucoup de temps avant les décisions"] },
-            { q: 28, options: ["Je valorise la liberté sur la gestion", "J'ai une grande fierté dans mes capacités", "J'interprète parfois les situations de manière pessimiste", "Je préfère ne pas me démarquer"] },
-            { q: 29, options: ["Mes émotions se montrent facilement extérieurement", "J'apprécie les discussions logiques", "J'ai besoin de temps seul", "J'ai parfois des difficultés à fixer des objectifs clairs"] },
-            { q: 30, options: ["Je gère parfois les choses superficiellement plutôt que profondément", "Je peux devenir sensible", "J'interprète parfois les situations négativement", "Ma tension peut baisser"] },
-            { q: 31, options: ["J'ai un fort désir d'être reconnu", "Quand je suis immergé dans le travail, je peux manquer des choses autour de moi", "J'ai tendance à me retirer des conflits", "Je m'inquiète beaucoup"] },
-            { q: 32, options: ["Je peux devenir bavard", "J'exprime peu d'émotions", "Je suis facilement blessé par de petits stimuli", "Je peux sembler passif"] },
-            { q: 33, options: ["Je peux laisser les choses dans des états désorganisés", "Ma tendance à diriger les autres devient forte", "J'ai tendance à me décourager facilement", "J'ai tendance à reporter les décisions"] },
-            { q: 34, options: ["Ma cohérence peut sembler faible", "Je peux manquer de générosité", "Je récupère l'énergie de manière introvertie", "J'exprime peu d'intérêt"] },
-            { q: 35, options: ["Mon environnement peut devenir désordonné", "Je choisis parfois d'utiliser les autres", "Je peux tomber en dépression", "J'exprime l'insatisfaction par des murmures"] },
-            { q: 36, options: ["Je veux me révéler", "Je peux être têtu", "Je peux devenir très méfiant", "J'entends que je suis lent"] },
-            { q: 37, options: ["Ma voix peut devenir forte", "J'affirme fortement mes opinions", "J'apprécie le temps seul", "Mes actions sont paisibles"] },
-            { q: 38, options: ["Ma concentration peut être dispersée", "Je peux devenir précipité", "Je ne fais pas facilement confiance aux autres", "Ma motivation peut baisser"] },
-            { q: 39, options: ["Je peux perdre mon sang-froid", "Je ne pense parfois pas assez", "Je garde des rancunes pendant longtemps", "Je me conforme même quand je ne veux pas"] },
-            { q: 40, options: ["Mon attitude peut changer selon mon humeur", "Je juge les situations rapidement", "Ma perspective critique peut devenir forte", "Je fais des compromis pour éviter les conflits"] }
-        ],
-        // 타입 설명
-        types: [
-            { shortName: "Expressif", englishName: "Expressive", desc: "Énergique, sociable et plein d'énergie qui mène l'atmosphère" },
-            { shortName: "Poussant", englishName: "Driving", desc: "Orienté objectif, décisif et fort en leadership" },
-            { shortName: "Réfléchi", englishName: "Reflective", desc: "Prudent, analytique et profond dans la pensée" },
-            { shortName: "Stable", englishName: "Stable", desc: "Type paisible, harmonieux et chaleureux qui se soucie des autres" }
-        ],
-        navTitle: "Test de Type de Tempérament",
-        currentLang: "Français",
-        testTag: "✨ Test Psychologique",
-        mainTitle: "Test de Type de Tempérament",
-        subtitle: "Découvrez votre tempérament caché",
-        startButton: "Commencer le Test",
-        question: "Question",
-        prevQuestion: "← Question Précédente",
-        resultTitle: "Résultats du Test de Tempérament",
-        temperamentType: "Type de Tempérament",
-        scoreDetails: "Score par Type",
-        viewDetails: "Voir Mon Analyse",
-        restart: "Recommencer",
-        testIntro: "Ce test est",
-        testIntroDesc: "pas une simple classification de personnalité.\nC'est un outil pour comprendre comment vous échangez de l'énergie avec le monde,\ncomment vous prenez des décisions, agissez et formez des relations—votre flux de tempérament.",
-        modelOrigin: "Origine du Modèle de Tempérament",
-        modelOriginDesc: "Ce modèle est basé sur l'ancienne théorie des quatre tempéraments:\nsanguin, colérique, mélancolique et flegmatique.\nCependant, nous nous sommes éloignés des noms obsolètes et des interprétations rigides,\nle reconstruisant avec un langage moderne: Expressif, Poussant, Réfléchi et Stable.",
-        allHaveFour: "Tout le Monde a les Quatre Tempéraments",
-        allHaveFourDesc: "Tout le monde possède les quatre éléments du tempérament.\nLa différence n'est pas 'avoir ou ne pas avoir',\nmais quel tempérament fonctionne plus fréquemment et intensément.",
-        testMethod: "Méthode du Test",
-        testMethodDesc: "À travers 40 questions,\nce test analyse la combinaison de tempéraments qui apparaît le plus naturellement en vous,\net présente le résultat comme l'un des 12 types de tempérament.",
-        testMethodTip: "💡 Veuillez sélectionner l'affirmation qui vous ressemble le plus.",
-        detailedResult: "Résultats Détaillés",
-        detailedResultDesc: "Les résultats incluent non seulement un nom de type,\nmais vos forces, précautions, style de relation, travail et style d'apprentissage,\net votre direction de croissance.",
-        testPurpose: "Objectif du Test",
-        testPurposeDesc: "L'objectif n'est pas de définir\n\"Je suis ce type de personne\",\nmais de comprendre \"Je peux grandir de cette manière\".",
-        timeInfo: "⏱️ Prend environ 5 minutes.\nVérifiez votre flux de tempérament maintenant.",
-        modalTitle: "Description Détaillée",
-        typeExpressive: "Expressif",
-        typeDriving: "Poussant",
-        typeReflective: "Réfléchi",
-        typeStable: "Stable"
-    },
-    ja: {
-        // 질문 데이터
-        questions: [
-            { q: 1, options: ["新しい人や状況に簡単にエネルギーが湧く", "新しい挑戦に比較的抵抗がない", "状況を分析し理解しようとする傾向がある", "状況に合わせて柔軟に調整する傾向がある"] },
-            { q: 2, options: ["雰囲気を明るくする傾向がある", "自分の意見を説得力を持って伝えようとする", "一度始めたことは最後までやり遂げる", "感情の起伏が大きくない"] },
-            { q: 3, options: ["人と一緒にいることで力を得る", "目標ができたら強く押し進める傾向がある", "他人のために自分のものを譲ることが多い", "与えられた環境に比較的よく適応する"] },
-            { q: 4, options: ["第一印象で好印象を与える傾向がある", "競争状況でモチベーションを感じる", "人の気持ちや立場をよく理解する", "感情を外に出すよりも内に秘める傾向がある"] },
-            { q: 5, options: ["新しいアイデアを思いつくのが好き", "問題解決能力が優れていると評価される", "他人を尊重する態度を重要視する", "初めて会う状況では慎重な傾向がある"] },
-            { q: 6, options: ["活動的な状況で気分が良くなる", "一人で決めて実行することを好む", "感情の変化に敏感な傾向がある", "他人の意見をよく受け入れる傾向がある"] },
-            { q: 7, options: ["自然に主導権を握ることが多い", "状況を肯定的に解釈しようとする", "計画を立てて従うことを重要視する", "比較的忍耐強い"] },
-            { q: 8, options: ["即座に反応して行動する傾向がある", "自分の選択に自信を持っている", "決められた手順や計画に従うのが楽", "口数は多くない"] },
-            { q: 9, options: ["全体的に楽観的な視点を持っている", "考えや感情を比較的率直に表現する", "整理整頓と体系を重要視する", "多様な人を受け入れる傾向がある"] },
-            { q: 10, options: ["話を面白く展開するのが得意", "自分の基準と視点が明確", "周りから信頼できる人と見なされる", "親切で思いやりのある態度がある"] },
-            { q: 11, options: ["人生で喜びを見つける傾向がある", "危険な状況でも大胆になれることがある", "細部まで気を配る傾向がある", "人間関係でスムーズに調整する"] },
-            { q: 12, options: ["表情と口調が明るい", "自分に対する自信が比較的強い", "品位と礼儀を重要視する", "安定した状態を好む"] },
-            { q: 13, options: ["外部刺激に簡単に動機づけられる", "独立して判断し行動する傾向がある", "理想的な価値と意味を重要視する", "穏やかで優しい印象を与える"] },
-            { q: 14, options: ["自分の考えを表現することに慣れている", "決定を下すときは速い", "一つのことに深く没頭する傾向がある", "真剣さとユーモアを一緒に使う"] },
-            { q: 15, options: ["新しい集まりにも比較的簡単に適応する", "アイデアや意見を頻繁に提案する", "芸術・音楽・感情的な活動を楽しむ", "対立状況で調停役を果たす"] },
-            { q: 16, options: ["言葉でコミュニケーションするのが好き", "成果と結果を重要視する", "決定前に十分に考える傾向がある", "他人の間違いに寛容な傾向がある"] },
-            { q: 17, options: ["感情と情熱が比較的明確", "引き受けた仕事に責任感を感じる", "関係で信頼と忠誠を重要視する", "相手の話をよく聞く"] },
-            { q: 18, options: ["人前に出ることに負担を感じない", "リーダー役を担うことが多い", "組織と構造を重要視する", "現在の状態に満足している"] },
-            { q: 19, options: ["人々によく知られる傾向がある", "効率と生産性を重視する", "完成度を高めようとする傾向がある", "快適さと安定感を追求する"] },
-            { q: 20, options: ["エネルギーが外によく現れる", "困難な状況でも冷静に対応する", "礼儀と規則を重要視する", "極端よりも中間を好む"] },
-            { q: 21, options: ["注目されたい気持ちが生じることがある", "指示したり制御しようとする傾向が現れる", "見知らぬ状況で萎縮することがある", "意欲が低下するとぼーっとする傾向がある"] },
-            { q: 22, options: ["感情のコントロールが難しいことがある", "感情に振り回されないようにしようとする", "傷を長く覚えている傾向がある", "情熱が低く見えることがある"] },
-            { q: 23, options: ["説明が長くなる場合がある", "権威に挑戦したくなることがある", "心の中に感情を溜め込む傾向がある", "やるべきことを先延ばしにする場合がある"] },
-            { q: 24, options: ["忘れることがよくある", "率直さのために誤解されることもある", "基準が高く厳しく感じられることがある", "心配が先に立つことがある"] },
-            { q: 25, options: ["会話中に割り込むことがある", "決定を急ぐ傾向がある", "感情の起伏が大きくなることがある", "決定をためらう傾向がある"] },
-            { q: 26, options: ["行動パターンが予測しにくいことがある", "感情を表現するのが苦手なことがある", "人間関係で存在感が弱いと感じることがある", "関係形成に積極的でないことがある"] },
-            { q: 27, options: ["即興的に流れに従うことがある", "自分の考えを簡単に変えない", "不満を内に溜め込む傾向がある", "決定の前に時間を長く使う"] },
-            { q: 28, options: ["管理よりも自由を重視する", "自分の能力に対する誇りが大きい", "状況を悲観的に解釈することがある", "目立たない方が楽"] },
-            { q: 29, options: ["感情が外に簡単に現れる", "論理的な討論を楽しむ", "一人の時間を必要とする", "明確な目標設定が難しいことがある"] },
-            { q: 30, options: ["深さよりも表面で処理することがある", "敏感になることがある", "状況を否定的に解釈することがある", "緊張感が低下することがある"] },
-            { q: 31, options: ["認められたい欲求が強い", "仕事に没頭すると周りを見落とすことがある", "対立から退く傾向がある", "心配が多い"] },
-            { q: 32, options: ["話が多くなることがある", "感情表現が少ない", "小さな刺激にも傷つきやすい", "消極的に見えることがある"] },
-            { q: 33, options: ["整理されていない状態を放置することがある", "他人を導こうとする傾向が強くなる", "簡単に落胆する傾向がある", "決定を延期する傾向がある"] },
-            { q: 34, options: ["一貫性が弱く見えることがある", "寛大さが不足することがある", "内向的にエネルギーを回復する", "関心表現が少ない"] },
-            { q: 35, options: ["周囲が乱雑になることがある", "他人を利用しようとする選択をすることがある", "うつ状態に陥ることがある", "不満を独り言で表現する"] },
-            { q: 36, options: ["自分の姿を表に出したい", "頑固になることがある", "疑いが多くなることがある", "速度が遅いと言われる"] },
-            { q: 37, options: ["声が大きくなることがある", "自分の主張を強く展開する", "一人の時間を楽しむ", "行動がのんびりしている"] },
-            { q: 38, options: ["集中力が分散することがある", "せっかちになることがある", "他人を簡単に信じない", "意欲が低下することがある"] },
-            { q: 39, options: ["冷静さを失うことがある", "十分に考えないことがある", "心の中のわだかまりを長く抱える", "気が進まなくても合わせる"] },
-            { q: 40, options: ["気分によって態度が変わることがある", "状況判断が速い", "批判的な視点が強くなることがある", "対立を避けるために妥協する"] }
-        ],
-        // 타입 설명
-        types: [
-            { shortName: "表現", englishName: "Expressive", desc: "活気に満ち、社交的で雰囲気をリードするエネルギーに溢れたタイプ" },
-            { shortName: "推進", englishName: "Driving", desc: "目標指向で決断力があり、リーダーシップが強いタイプ" },
-            { shortName: "内省", englishName: "Reflective", desc: "慎重で分析的、深い思考をするタイプ" },
-            { shortName: "安定", englishName: "Stable", desc: "平和で調和があり、他者を思いやる温かいタイプ" }
-        ],
-        navTitle: "気質タイプテスト",
-        currentLang: "日本語",
-        testTag: "✨ 心理テスト",
-        mainTitle: "気質タイプテスト",
-        subtitle: "あなたの隠された気質を発見しましょう",
-        startButton: "テストを開始",
-        question: "質問",
-        prevQuestion: "← 前の質問",
-        resultTitle: "気質タイプテスト結果",
-        temperamentType: "気質タイプ",
-        scoreDetails: "タイプ別スコア",
-        viewDetails: "私の分析を見る",
-        restart: "やり直す",
-        testIntro: "このテストは",
-        testIntroDesc: "単純な性格分類ではありません。\n世界とエネルギーを交換する方法、\n決定し、行動し、関係を築く気質の流れを理解するためのツールです。",
-        modelOrigin: "気質モデルの起源",
-        modelOriginDesc: "このモデルは古代から続く\n多血質、胆汁質、憂鬱質、粘液質の4気質理論に基づいています。\nしかし、時代に合わない名称と固定的な解釈から離れ、\n表現、推進、内省、安定という現代的な言語で再構成しました。",
-        allHaveFour: "すべての人が4つの気質を持っています",
-        allHaveFourDesc: "誰もがこの4つの気質要素をすべて持っています。\n違いは「ある/ない」ではなく、\nどの気質がより頻繁に、より強く機能するかです。",
-        testMethod: "テスト方法",
-        testMethodDesc: "40の質問を通じて、\nあなたに最も自然に現れる気質の組み合わせを分析し、\nその結果を12種類の気質タイプとして提示します。",
-        testMethodTip: "💡 自分に最も近いと思う文章を選択してください。",
-        detailedResult: "詳細な結果",
-        detailedResultDesc: "結果は単純なタイプ名だけでなく、\nあなたの強みと注意点、関係の仕方、仕事と学習スタイル、\nそして今後の成長方向まで一緒に案内します。",
-        testPurpose: "テストの目的",
-        testPurposeDesc: "このテストの目的は、\n「私はこのような人だ」と規定するのではなく、\n「私はこの方法で成長できる」を理解することです。",
-        timeInfo: "⏱️ 約5分で十分です。\n今、あなたの気質の流れを確認してください。",
-        modalTitle: "詳細説明",
-        typeExpressive: "表現型",
-        typeDriving: "推進型",
-        typeReflective: "内省型",
-        typeStable: "安定型"
-    },
     vi: {
         // 질문 데이터
         questions: [
@@ -1281,90 +999,6 @@ const translations = {
         typeReflective: "Suy Tư",
         typeStable: "Ổn Định"
     },
-    th: {
-        // 질문ข้อมูล
-        questions: [
-            { q: 1, options: ["ฉันได้รับพลังงานอย่างง่ายดายจากคนใหม่หรือสถานการณ์ใหม่", "ฉันค่อนข้างเปิดรับความท้าทายใหม่", "ฉันมีแนวโน้มที่จะวิเคราะห์และทำความเข้าใจสถานการณ์", "ฉันมีแนวโน้มที่จะปรับตัวได้อย่างยืดหยุ่นกับสถานการณ์"] },
-            { q: 2, options: ["ฉันมีแนวโน้มที่จะทำให้บรรยากาศสดใส", "ฉันพยายามถ่ายทอดความคิดเห็นของฉันอย่างน่าเชื่อถือ", "เมื่อฉันเริ่มทำอะไรสักอย่าง ฉันจะทำจนเสร็จ", "ฉันไม่มีความผันผวนทางอารมณ์มาก"] },
-            { q: 3, options: ["ฉันได้รับพลังจากการอยู่กับผู้คน", "เมื่อฉันมีเป้าหมาย ฉันจะผลักดันอย่างหนัก", "ฉันมักจะสละสิ่งของของตัวเองเพื่อผู้อื่น", "ฉันปรับตัวได้ค่อนข้างดีกับสภาพแวดล้อมที่ได้รับ"] },
-            { q: 4, options: ["ฉันมีแนวโน้มที่จะสร้างความประทับใจแรกที่ดี", "ฉันรู้สึกมีแรงจูงใจในสถานการณ์การแข่งขัน", "ฉันเก่งในการเข้าใจความรู้สึกหรือตำแหน่งของผู้คน", "ฉันมีแนวโน้มที่จะเก็บอารมณ์ไว้ข้างในมากกว่าที่จะแสดงออก"] },
-            { q: 5, options: ["ฉันชอบคิดไอเดียใหม่ๆ", "ฉันได้รับการประเมินว่ามีทักษะการแก้ปัญหาที่ยอดเยี่ยม", "ฉันให้ความสำคัญกับการเคารพผู้อื่น", "ฉันมีแนวโน้มที่จะระมัดระวังในสถานการณ์ใหม่"] },
-            { q: 6, options: ["ฉันรู้สึกดีในสถานการณ์ที่กระตือรือร้น", "ฉันชอบตัดสินใจและลงมือทำคนเดียว", "ฉันไวต่อการเปลี่ยนแปลงทางอารมณ์", "ฉันมีแนวโน้มที่จะยอมรับความคิดเห็นของผู้อื่นได้ดี"] },
-            { q: 7, options: ["ฉันมักจะรับบทบาทผู้นำอย่างเป็นธรรมชาติ", "ฉันพยายามตีความสถานการณ์ในเชิงบวก", "ฉันให้ความสำคัญกับการวางแผนและทำตามแผน", "ฉันค่อนข้างอดทน"] },
-            { q: 8, options: ["ฉันมีแนวโน้มที่จะตอบสนองและลงมือทำทันที", "ฉันมั่นใจในการเลือกของฉัน", "ฉันรู้สึกสบายใจกับการทำตามขั้นตอนหรือแผนที่กำหนดไว้", "ฉันไม่ค่อยพูดมาก"] },
-            { q: 9, options: ["ฉันโดยทั่วไปมีมุมมองในแง่ดี", "ฉันแสดงความคิดและความรู้สึกของฉันค่อนข้างซื่อสัตย์", "ฉันให้ความสำคัญกับการจัดระเบียบและระบบ", "ฉันมีแนวโน้มที่จะยอมรับผู้คนที่หลากหลาย"] },
-            { q: 10, options: ["ฉันเก่งในการเล่าเรื่องอย่างน่าสนใจ", "ฉันมีมาตรฐานและมุมมองที่ชัดเจน", "ฉันถูกมองว่าเป็นคนที่เชื่อถือได้", "ฉันมีทัศนคติที่ใจดีและเอาใจใส่"] },
-            { q: 11, options: ["ฉันพบความสุขในชีวิต", "ฉันสามารถกล้าหาญได้แม้ในสถานการณ์ที่เสี่ยง", "ฉันใส่ใจรายละเอียด", "ฉันประสานงานได้อย่างราบรื่นในความสัมพันธ์"] },
-            { q: 12, options: ["การแสดงออกและน้ำเสียงของฉันสดใส", "ฉันมีความมั่นใจในตัวเองค่อนข้างแข็งแกร่ง", "ฉันให้ความสำคัญกับศักดิ์ศรีและมารยาท", "ฉันชอบสถานะที่มั่นคง"] },
-            { q: 13, options: ["ฉันถูกกระตุ้นได้ง่ายด้วยสิ่งเร้าภายนอก", "ฉันมีแนวโน้มที่จะตัดสินและกระทำอย่างอิสระ", "ฉันให้ความสำคัญกับค่านิยมและความหมายในอุดมคติ", "ฉันให้ความประทับใจที่นุ่มนวลและอ่อนโยน"] },
-            { q: 14, options: ["ฉันคุ้นเคยกับการแสดงความคิดของฉัน", "ฉันเร็วเมื่อต้องตัดสินใจ", "ฉันมีแนวโน้มที่จะจดจ่อลึกซึ้งกับสิ่งหนึ่ง", "ฉันใช้ความจริงจังและอารมณ์ขันร่วมกัน"] },
-            { q: 15, options: ["ฉันปรับตัวได้ค่อนข้างง่ายกับการพบปะใหม่ๆ", "ฉันมักจะเสนอไอเดียหรือความคิดเห็น", "ฉันสนุกกับกิจกรรมทางศิลปะ ดนตรี และอารมณ์", "ฉันเล่นบทบาทเป็นผู้ไกล่เกลี่ยในความขัดแย้ง"] },
-            { q: 16, options: ["ฉันชอบสื่อสารผ่านคำพูด", "ฉันให้ความสำคัญกับผลลัพธ์และผลลัพธ์", "ฉันมีแนวโน้มที่จะคิดอย่างละเอียดก่อนตัดสินใจ", "ฉันอดทนต่อข้อผิดพลาดของผู้อื่น"] },
-            { q: 17, options: ["อารมณ์และความหลงใหลของฉันค่อนข้างชัดเจน", "ฉันรู้สึกมีความรับผิดชอบต่องานที่ฉันรับผิดชอบ", "ฉันให้ความสำคัญกับความไว้วางใจและความภักดีในความสัมพันธ์", "ฉันฟังเรื่องราวของผู้อื่นได้ดี"] },
-            { q: 18, options: ["ฉันไม่รู้สึกเป็นภาระเมื่ออยู่ต่อหน้าผู้คน", "ฉันมักจะรับบทบาทผู้นำ", "ฉันให้ความสำคัญกับการจัดระเบียบและโครงสร้าง", "ฉันพอใจกับสถานะปัจจุบัน"] },
-            { q: 19, options: ["ฉันมีแนวโน้มที่จะเป็นที่รู้จักในหมู่ผู้คน", "ฉันเน้นประสิทธิภาพและผลผลิต", "ฉันมีแนวโน้มที่จะมุ่งไปสู่การเสร็จสมบูรณ์สูง", "ฉันแสวงหาความสะดวกสบายและความมั่นคง"] },
-            { q: 20, options: ["พลังงานของฉันแสดงออกมาภายนอกได้ดี", "ฉันตอบสนองอย่างสงบแม้ในสถานการณ์ที่ยากลำบาก", "ฉันให้ความสำคัญกับมารยาทและกฎเกณฑ์", "ฉันชอบจุดกึ่งกลางมากกว่าสุดขั้ว"] },
-            { q: 21, options: ["ฉันบางครั้งต้องการได้รับความสนใจ", "ฉันแสดงแนวโน้มที่จะชี้นำหรือควบคุม", "ฉันสามารถหดตัวในสถานการณ์ที่ไม่คุ้นเคย", "ฉันมีแนวโน้มที่จะเหม่อลอยเมื่อแรงจูงใจลดลง"] },
-            { q: 22, options: ["ฉันบางครั้งมีปัญหาในการควบคุมอารมณ์", "ฉันพยายามไม่ให้ถูกชักจูงโดยอารมณ์", "ฉันจำความเจ็บปวดได้นาน", "ความหลงใหลของฉันอาจดูต่ำ"] },
-            { q: 23, options: ["คำอธิบายของฉันอาจยาวขึ้น", "ฉันบางครั้งต้องการท้าทายอำนาจ", "ฉันมีแนวโน้มที่จะเก็บอารมณ์ไว้ข้างใน", "ฉันบางครั้งผัดผ่อนสิ่งที่ฉันต้องทำ"] },
-            { q: 24, options: ["ฉันมักจะลืมสิ่งต่างๆ", "ฉันบางครั้งถูกเข้าใจผิดเพราะความซื่อสัตย์ของฉัน", "มาตรฐานของฉันอาจดูสูงเกินไปและจู้จี้", "ความกังวลมักมาก่อน"] },
-            { q: 25, options: ["ฉันบางครั้งขัดจังหวะระหว่างการสนทนา", "ฉันมีแนวโน้มที่จะรีบเร่งการตัดสินใจ", "ความผันผวนทางอารมณ์ของฉันอาจใหญ่", "ฉันมีแนวโน้มที่จะลังเลในการตัดสินใจ"] },
-            { q: 26, options: ["รูปแบบพฤติกรรมของฉันอาจคาดเดาได้ยาก", "ฉันอาจจะงุ่มง่ามในการแสดงอารมณ์", "ฉันอาจรู้สึกว่าการมีอยู่ของฉันอ่อนแอในความสัมพันธ์", "ฉันบางครั้งไม่กระตือรือร้นในการสร้างความสัมพันธ์"] },
-            { q: 27, options: ["ฉันบางครั้งทำตามกระแสอย่างเป็นธรรมชาติ", "ฉันไม่เปลี่ยนความคิดของฉันได้ง่าย", "ฉันมีแนวโน้มที่จะสะสมความไม่พอใจไว้ข้างใน", "ฉันใช้เวลานานก่อนการตัดสินใจ"] },
-            { q: 28, options: ["ฉันให้ความสำคัญกับเสรีภาพมากกว่าการจัดการ", "ฉันมีความภาคภูมิใจอย่างมากในความสามารถของฉัน", "ฉันบางครั้งตีความสถานการณ์ในแง่ร้าย", "ฉันชอบไม่โดดเด่น"] },
-            { q: 29, options: ["อารมณ์ของฉันแสดงออกมาภายนอกได้ง่าย", "ฉันสนุกกับการอภิปรายเชิงตรรกะ", "ฉันต้องการเวลาอยู่คนเดียว", "ฉันบางครั้งมีปัญหาในการตั้งเป้าหมายที่ชัดเจน"] },
-            { q: 30, options: ["ฉันบางครั้งจัดการสิ่งต่างๆ อย่างผิวเผินมากกว่าลึกซึ้ง", "ฉันสามารถกลายเป็นอ่อนไหว", "ฉันบางครั้งตีความสถานการณ์ในแง่ลบ", "ความตึงเครียดของฉันอาจลดลง"] },
-            { q: 31, options: ["ฉันมีความปรารถนาอย่างแรงกล้าที่จะได้รับการยอมรับ", "เมื่อฉันจดจ่อกับงาน ฉันอาจพลาดสิ่งต่างๆ รอบตัว", "ฉันมีแนวโน้มที่จะถอนตัวจากความขัดแย้ง", "ฉันกังวลมาก"] },
-            { q: 32, options: ["ฉันสามารถกลายเป็นพูดมาก", "ฉันแสดงอารมณ์น้อย", "ฉันถูกทำร้ายได้ง่ายด้วยสิ่งเร้าเล็กๆ", "ฉันอาจดูเฉื่อยชา"] },
-            { q: 33, options: ["ฉันสามารถปล่อยให้สิ่งต่างๆ อยู่ในสถานะที่ไม่เป็นระเบียบ", "แนวโน้มของฉันในการนำผู้อื่นกลายเป็นแข็งแกร่ง", "ฉันมีแนวโน้มที่จะท้อแท้ง่าย", "ฉันมีแนวโน้มที่จะเลื่อนการตัดสินใจ"] },
-            { q: 34, options: ["ความสอดคล้องของฉันอาจดูอ่อนแอ", "ฉันสามารถขาดความเอื้ออาทร", "ฉันฟื้นฟูพลังงานอย่างเก็บตัว", "ฉันแสดงความสนใจน้อย"] },
-            { q: 35, options: ["สภาพแวดล้อมรอบตัวฉันอาจกลายเป็นยุ่งเหยิง", "ฉันบางครั้งเลือกใช้ผู้อื่น", "ฉันสามารถตกอยู่ในภาวะซึมเศร้า", "ฉันแสดงความไม่พอใจผ่านการบ่นพึมพำ"] },
-            { q: 36, options: ["ฉันต้องการเปิดเผยตัวเอง", "ฉันสามารถดื้อรั้น", "ฉันสามารถกลายเป็นสงสัยมาก", "ฉันได้ยินว่าฉันช้า"] },
-            { q: 37, options: ["เสียงของฉันสามารถกลายเป็นดัง", "ฉันยืนยันความคิดเห็นของฉันอย่างแข็งแกร่ง", "ฉันสนุกกับเวลาอยู่คนเดียว", "การกระทำของฉันเป็นไปอย่างสบายๆ"] },
-            { q: 38, options: ["ความเข้มข้นของฉันอาจกระจัดกระจาย", "ฉันสามารถกลายเป็นรีบร้อน", "ฉันไม่ไว้วางใจผู้อื่นได้ง่าย", "แรงจูงใจของฉันอาจลดลง"] },
-            { q: 39, options: ["ฉันสามารถสูญเสียความสงบ", "ฉันบางครั้งคิดไม่เพียงพอ", "ฉันเก็บความแค้นไว้นาน", "ฉันยอมตามแม้ว่าฉันจะไม่ต้องการ"] },
-            { q: 40, options: ["ทัศนคติของฉันสามารถเปลี่ยนไปตามอารมณ์", "ฉันตัดสินสถานการณ์ได้อย่างรวดเร็ว", "มุมมองเชิงวิพากษ์ของฉันสามารถกลายเป็นแข็งแกร่ง", "ฉันประนีประนอมเพื่อหลีกเลี่ยงความขัดแย้ง"] }
-        ],
-        // 타입 설명
-        types: [
-            { shortName: "แสดงออก", englishName: "Expressive", desc: "กระตือรือร้น สังคม และเต็มไปด้วยพลังงานที่นำบรรยากาศ" },
-            { shortName: "ขับเคลื่อน", englishName: "Driving", desc: "มุ่งเน้นเป้าหมาย มีความเด็ดขาด และแข็งแกร่งในการเป็นผู้นำ" },
-            { shortName: "ไตร่ตรอง", englishName: "Reflective", desc: "ระมัดระวัง วิเคราะห์ และลึกซึ้งในการคิด" },
-            { shortName: "มั่นคง", englishName: "Stable", desc: "สงบ กลมกลืน และอบอุ่น ใส่ใจผู้อื่น" }
-        ],
-        navTitle: "แบบทดสอบประเภทอารมณ์",
-        currentLang: "ไทย",
-        testTag: "✨ แบบทดสอบจิตวิทยา",
-        mainTitle: "แบบทดสอบประเภทอารมณ์",
-        subtitle: "ค้นพบอารมณ์ที่ซ่อนอยู่ของคุณ",
-        startButton: "เริ่มทำแบบทดสอบ",
-        question: "คำถาม",
-        prevQuestion: "← คำถามก่อนหน้า",
-        resultTitle: "ผลการทดสอบประเภทอารมณ์",
-        temperamentType: "ประเภทอารมณ์",
-        scoreDetails: "คะแนนตามประเภท",
-        viewDetails: "ดูการวิเคราะห์ของฉัน",
-        restart: "ทำใหม่",
-        testIntro: "แบบทดสอบนี้",
-        testIntroDesc: "ไม่ใช่การจำแนกบุคลิกภาพแบบง่ายๆ\nเป็นเครื่องมือเพื่อทำความเข้าใจวิธีที่คุณแลกเปลี่ยนพลังงานกับโลก\nวิธีที่คุณตัดสินใจ กระทำ และสร้างความสัมพันธ์—การไหลของอารมณ์ของคุณ",
-        modelOrigin: "ที่มาของแบบจำลองอารมณ์",
-        modelOriginDesc: "แบบจำลองนี้อิงตามทฤษฎีอารมณ์สี่ประเภทโบราณ:\nเลือดร้อน ใจร้อน เศร้าโศก และเยือกเย็น\nอย่างไรก็ตาม เราได้ห่างไกลจากชื่อที่ล้าสมัยและการตีความที่เข้มงวด\nสร้างใหม่ด้วยภาษาสมัยใหม่: แสดงออก ขับเคลื่อน ไตร่ตรอง และมั่นคง",
-        allHaveFour: "ทุกคนมีอารมณ์ทั้งสี่ประเภท",
-        allHaveFourDesc: "ทุกคนมีองค์ประกอบอารมณ์ทั้งสี่ประเภท\nความแตกต่างไม่ใช่ 'มีหรือไม่มี'\nแต่อารมณ์ใดที่ทำงานบ่อยและเข้มข้นกว่า",
-        testMethod: "วิธีการทดสอบ",
-        testMethodDesc: "ผ่าน 40 คำถาม\nแบบทดสอบนี้วิเคราะห์การรวมกันของอารมณ์ที่ปรากฏตามธรรมชาติในตัวคุณมากที่สุด\nและนำเสนอผลลัพธ์เป็นหนึ่งใน 12 ประเภทอารมณ์",
-        testMethodTip: "💡 กรุณาเลือกข้อความที่คุณรู้สึกใกล้เคียงที่สุด",
-        detailedResult: "ผลลัพธ์โดยละเอียด",
-        detailedResultDesc: "ผลลัพธ์รวมไม่เพียงแค่ชื่อประเภท\nแต่ยังรวมถึงจุดแข็ง ข้อควรระวัง สไตล์ความสัมพันธ์ งานและสไตล์การเรียนรู้\nและทิศทางการเติบโตของคุณ",
-        testPurpose: "จุดประสงค์ของการทดสอบ",
-        testPurposeDesc: "จุดประสงค์ไม่ใช่เพื่อกำหนด\n\"ฉันเป็นคนประเภทนี้\"\nแต่เพื่อเข้าใจ \"ฉันสามารถเติบโตในวิธีนี้\"",
-        timeInfo: "⏱️ ใช้เวลาประมาณ 5 นาที\nตรวจสอบการไหลของอารมณ์ของคุณตอนนี้",
-        modalTitle: "คำอธิบายโดยละเอียด",
-        typeExpressive: "แสดงออก",
-        typeDriving: "ขับเคลื่อน",
-        typeReflective: "ไตร่ตรอง",
-        typeStable: "มั่นคง"
-    }
 };
 
 // 언어 변경 함수
