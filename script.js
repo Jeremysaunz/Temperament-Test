@@ -420,9 +420,24 @@ function closeDetailModal() {
 // 상세 설명 데이터 로드
 async function loadTemperamentDetails() {
     try {
-        const response = await fetch('12temperament_types.txt');
-        const text = await response.text();
-        temperamentDetails = parseTemperamentDetails(text);
+        // 현재 언어에 맞는 파일명 결정
+        const lang = currentLanguage || 'ko';
+        const filename = `12temperament_types-${lang}.txt`;
+        
+        const response = await fetch(filename);
+        if (!response.ok) {
+            // 해당 언어 파일이 없으면 한국어 파일로 폴백
+            const fallbackResponse = await fetch('12temperament_types-ko.txt');
+            if (!fallbackResponse.ok) {
+                throw new Error(`Fallback file 12temperament_types-ko.txt not found: ${fallbackResponse.status}`);
+            }
+            const fallbackText = await fallbackResponse.text();
+            temperamentDetails = parseTemperamentDetails(fallbackText);
+            console.warn(`Language-specific file ${filename} not found. Falling back to 12temperament_types-ko.txt.`);
+        } else {
+            const text = await response.text();
+            temperamentDetails = parseTemperamentDetails(text);
+        }
     } catch (error) {
         console.error('상세 설명 파일을 불러올 수 없습니다:', error);
         alert('상세 설명을 불러올 수 없습니다. 파일이 같은 폴더에 있는지 확인해주세요.');
@@ -571,38 +586,26 @@ function formatDetailContent(detail) {
     
     let html = '';
     
-    // 섹션 순서 정의
-    const sectionOrder = [
-        '이 기질은 어떤 에너지 구조인가',
-        '핵심 성향 한눈에 보기',
-        '강점이 발휘되는 순간',
-        '흔히 겪는 오해와 그림자',
-        '감정 흐름과 회복 패턴',
-        '관계 속에서의 기질 반응',
-        '팀과 조직 안에서의 역할',
-        '일하는 방식과 실행 리듬',
-        '성장 방향과 기질 관리 전략',
-        '이 기질을 한 문장으로 말하면'
+    // 섹션별 색상 정의 (인덱스 기반)
+    const sectionColors = [
+        'from-purple-500 to-pink-500',
+        'from-blue-500 to-cyan-500',
+        'from-green-500 to-emerald-500',
+        'from-orange-500 to-red-500',
+        'from-pink-500 to-rose-500',
+        'from-indigo-500 to-purple-500',
+        'from-teal-500 to-cyan-500',
+        'from-amber-500 to-orange-500',
+        'from-violet-500 to-purple-500',
+        'from-rose-500 to-pink-500'
     ];
     
-    // 섹션별 색상 정의
-    const sectionColors = {
-        '이 기질은 어떤 에너지 구조인가': 'from-purple-500 to-pink-500',
-        '핵심 성향 한눈에 보기': 'from-blue-500 to-cyan-500',
-        '강점이 발휘되는 순간': 'from-green-500 to-emerald-500',
-        '흔히 겪는 오해와 그림자': 'from-orange-500 to-red-500',
-        '감정 흐름과 회복 패턴': 'from-pink-500 to-rose-500',
-        '관계 속에서의 기질 반응': 'from-indigo-500 to-purple-500',
-        '팀과 조직 안에서의 역할': 'from-teal-500 to-cyan-500',
-        '일하는 방식과 실행 리듬': 'from-amber-500 to-orange-500',
-        '성장 방향과 기질 관리 전략': 'from-violet-500 to-purple-500',
-        '이 기질을 한 문장으로 말하면': 'from-rose-500 to-pink-500'
-    };
-    
-    sectionOrder.forEach((sectionTitle, index) => {
+    // 실제 파싱된 섹션들을 순서대로 표시
+    const sections = Object.keys(detail.sections);
+    sections.forEach((sectionTitle, index) => {
         const content = detail.sections[sectionTitle];
         if (content) {
-            const gradientColor = sectionColors[sectionTitle] || 'from-slate-500 to-slate-600';
+            const gradientColor = sectionColors[index % sectionColors.length] || 'from-slate-500 to-slate-600';
             
             // 내용 포맷팅 (플레인 텍스트)
             const formattedContent = formatSectionContent(content);
