@@ -480,8 +480,10 @@ function parseTemperamentDetails(text) {
             // name_en: Expressive-Driving Type 형식
             else if (line.startsWith('name_en:')) {
                 let en = line.replace('name_en:', '').trim();
-                en = en.replace(/\s+Type$/, '').replace(/[–—]/g, '-');
-                englishName = en;
+                // 괄호 안의 내용 제거 (예: "Expressive-Driving Type (Kiểu Biểu đạt – Thúc đẩy)" -> "Expressive-Driving Type")
+                en = en.replace(/\s*\([^)]*\)\s*$/, '');
+                en = en.replace(/\s+Type$/i, '').replace(/[–—]/g, '-');
+                englishName = en.trim();
                 lineIndex++;
                 continue;
             }
@@ -528,13 +530,20 @@ function parseTemperamentDetails(text) {
             parsedSections[currentSection] = currentContent.join('\n').trim();
         }
         
-        if (koreanName && englishName) {
-            details[koreanName] = {
-                koreanName: koreanName,
+        // koreanName 또는 englishName 중 하나라도 있으면 저장
+        if (englishName) {
+            // 영어 이름을 기본 키로 사용 (한국어 이름이 없을 경우)
+            const key = koreanName || englishName;
+            details[key] = {
+                koreanName: koreanName || englishName,
                 englishName: englishName,
                 sections: parsedSections
             };
-            console.log(`파싱 완료: ${koreanName} (${englishName})`);
+            // 영어 이름으로도 인덱싱 (한국어 이름이 없을 경우를 위해)
+            if (!koreanName) {
+                details[englishName] = details[key];
+            }
+            console.log(`파싱 완료: ${key} (${englishName})`);
         }
     });
     
@@ -556,23 +565,36 @@ function findTemperamentDetail(combination) {
     console.log('찾는 조합:', combination);
     console.log('사용 가능한 키:', Object.keys(temperamentDetails));
     
-    // 한국어 이름으로 찾기
+    // 1. 한국어 이름으로 찾기
     let detail = temperamentDetails[combination.koreanName];
-    
-    // 영어 이름으로도 찾기 시도 (하이픈 정규화)
-    if (!detail) {
-        const normalizedEnglish = combination.englishName.replace(/[–—]/g, '-');
-        for (const key in temperamentDetails) {
-            const detailItem = temperamentDetails[key];
-            const normalizedDetailEnglish = detailItem.englishName.replace(/[–—]/g, '-');
-            if (normalizedDetailEnglish.toLowerCase() === normalizedEnglish.toLowerCase()) {
-                detail = detailItem;
-                console.log('영어 이름으로 찾음:', key);
-                break;
-            }
-        }
-    } else {
+    if (detail) {
         console.log('한국어 이름으로 찾음:', combination.koreanName);
+        return detail;
+    }
+    
+    // 2. 영어 이름으로 직접 찾기 (키로 저장된 경우)
+    const normalizedEnglish = combination.englishName.replace(/[–—]/g, '-').replace(/\s+Type$/i, '');
+    detail = temperamentDetails[normalizedEnglish];
+    if (detail) {
+        console.log('영어 이름으로 직접 찾음:', normalizedEnglish);
+        return detail;
+    }
+    
+    // 3. 영어 이름으로 순회하며 찾기 (하이픈 정규화)
+    for (const key in temperamentDetails) {
+        const detailItem = temperamentDetails[key];
+        if (!detailItem || !detailItem.englishName) continue;
+        
+        const normalizedDetailEnglish = detailItem.englishName.replace(/[–—]/g, '-').replace(/\s+Type$/i, '');
+        if (normalizedDetailEnglish.toLowerCase() === normalizedEnglish.toLowerCase()) {
+            detail = detailItem;
+            console.log('영어 이름으로 순회하여 찾음:', key, normalizedDetailEnglish);
+            break;
+        }
+    }
+    
+    if (!detail) {
+        console.error('상세 설명을 찾을 수 없습니다. 조합:', combination);
     }
     
     return detail;
