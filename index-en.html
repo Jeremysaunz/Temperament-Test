@@ -273,8 +273,14 @@
             </div>
 
             <button onclick="startTest()"
-                class="w-full bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-bold py-3 sm:py-4 rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-[0.98] mb-4 sm:mb-6 text-sm sm:text-base">
-                Start Test
+                class="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-[length:200%_100%] text-white font-bold py-5 sm:py-6 md:py-7 rounded-2xl transition-all duration-300 shadow-2xl hover:shadow-purple-500/50 active:scale-[0.97] mb-4 sm:mb-6 text-lg sm:text-xl md:text-2xl animate-pulse hover:animate-none hover:bg-[length:200%_100%] hover:bg-[position:100%_0%] transform hover:scale-[1.02] relative overflow-hidden group">
+                <span class="relative z-10 flex items-center justify-center gap-2">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 animate-bounce group-hover:animate-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span id="start-button-text">Start Test</span>
+                </span>
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             </button>
             
             <div class="flex justify-center mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-200">

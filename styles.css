@@ -98,3 +98,26 @@ body {
 .animate-fadeIn {
     animation: fadeIn 0.2s ease-out;
 }
+
+/* 시작 버튼 그라데이션 애니메이션 */
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.start-button-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+}
+
+.start-button-gradient:hover {
+    animation: none;
+    background-position: 100% 50%;
+}

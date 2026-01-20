@@ -1147,9 +1147,11 @@ function updateStartScreen(t) {
     const timeInfo = document.querySelector('#start-screen .bg-gradient-to-r.from-slate-50');
     if (timeInfo) timeInfo.innerHTML = t.timeInfo.replace(/\n/g, '<br>');
     
-    // 시작 버튼
-    const startButton = document.querySelector('button[onclick="startTest()"]');
-    if (startButton) startButton.textContent = t.startButton;
+    // 시작 버튼 텍스트 업데이트
+    const startButtonText = document.getElementById('start-button-text');
+    if (startButtonText) {
+        startButtonText.textContent = t.startButton;
+    }
 }
 
 // 모든 화면 업데이트
