@@ -1214,4 +1214,426 @@ document.addEventListener('DOMContentLoaded', () => {
     if (t) {
         updateAllScreens();
     }
+    
+    // 다크 모드 초기화
+    initDarkMode();
+    
+    // 저장된 진행 상태 확인
+    checkSavedProgress();
 });
+
+// ========================================
+// 다크 모드 기능
+// ========================================
+function initDarkMode() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+    } else if (prefersDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        updateThemeIcon('dark');
+    }
+}
+
+function toggleDarkMode() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) {
+        themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+}
+
+// ========================================
+// 레이더 차트 기능
+// ========================================
+function drawRadarChart(canvasId, scores, animated = true) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(width, height) / 2 - 40;
+    
+    // 레이블
+    const labels = ['표현', '추진', '성찰', '안정'];
+    const colors = ['#fb923c', '#a855f7', '#14b8a6', '#22c55e'];
+    
+    // 최대 점수 (40문항 기준)
+    const maxScore = 40;
+    
+    // 애니메이션 변수
+    let animationProgress = animated ? 0 : 1;
+    
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // 배경 원 그리기
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        ctx.strokeStyle = isDark ? '#475569' : '#e2e8f0';
+        ctx.lineWidth = 1;
+        
+        for (let i = 1; i <= 4; i++) {
+            ctx.beginPath();
+            const r = (radius / 4) * i;
+            for (let j = 0; j < 4; j++) {
+                const angle = (Math.PI / 2) * j - Math.PI / 2;
+                const x = centerX + r * Math.cos(angle);
+                const y = centerY + r * Math.sin(angle);
+                if (j === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+        
+        // 축 그리기
+        for (let i = 0; i < 4; i++) {
+            const angle = (Math.PI / 2) * i - Math.PI / 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle));
+            ctx.stroke();
+        }
+        
+        // 데이터 영역 그리기
+        ctx.beginPath();
+        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+        gradient.addColorStop(0, 'rgba(168, 85, 247, 0.3)');
+        gradient.addColorStop(1, 'rgba(236, 72, 153, 0.1)');
+        ctx.fillStyle = gradient;
+        ctx.strokeStyle = '#a855f7';
+        ctx.lineWidth = 3;
+        
+        for (let i = 0; i < 4; i++) {
+            const angle = (Math.PI / 2) * i - Math.PI / 2;
+            const value = (scores[i] / maxScore) * radius * animationProgress;
+            const x = centerX + value * Math.cos(angle);
+            const y = centerY + value * Math.sin(angle);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // 점 그리기
+        for (let i = 0; i < 4; i++) {
+            const angle = (Math.PI / 2) * i - Math.PI / 2;
+            const value = (scores[i] / maxScore) * radius * animationProgress;
+            const x = centerX + value * Math.cos(angle);
+            const y = centerY + value * Math.sin(angle);
+            
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = colors[i];
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        
+        // 레이블 그리기
+        ctx.font = 'bold 14px "Noto Sans KR", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        const labelOffsets = [
+            { x: 0, y: -radius - 20 },
+            { x: radius + 25, y: 0 },
+            { x: 0, y: radius + 20 },
+            { x: -radius - 25, y: 0 }
+        ];
+        
+        for (let i = 0; i < 4; i++) {
+            ctx.fillStyle = colors[i];
+            ctx.fillText(labels[i], centerX + labelOffsets[i].x, centerY + labelOffsets[i].y);
+            
+            // 점수 표시
+            ctx.font = '12px "Noto Sans KR", sans-serif';
+            ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+            const scoreText = `${Math.round(scores[i] * animationProgress)}점`;
+            ctx.fillText(scoreText, centerX + labelOffsets[i].x, centerY + labelOffsets[i].y + 16);
+            ctx.font = 'bold 14px "Noto Sans KR", sans-serif';
+        }
+        
+        // 애니메이션 진행
+        if (animationProgress < 1 && animated) {
+            animationProgress += 0.05;
+            requestAnimationFrame(draw);
+        }
+    }
+    
+    draw();
+}
+
+// ========================================
+// SNS 공유 기능
+// ========================================
+function shareToTwitter() {
+    if (!currentCombination) return;
+    
+    const text = `나의 기질 유형은 "${currentCombination.fullName}"입니다! 🎯\n\n기질유형테스트로 나의 숨겨진 기질을 알아보세요!`;
+    const url = window.location.href.split('?')[0];
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    
+    window.open(twitterUrl, '_blank', 'width=600,height=400');
+}
+
+function copyResultLink() {
+    const url = window.location.href.split('?')[0];
+    
+    navigator.clipboard.writeText(url).then(() => {
+        showCopyToast();
+    }).catch(() => {
+        // 폴백: 구형 브라우저 지원
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showCopyToast();
+    });
+}
+
+function showCopyToast() {
+    const toast = document.getElementById('copy-toast');
+    if (toast) {
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2500);
+    }
+}
+
+// ========================================
+// 격려 메시지 기능
+// ========================================
+const encouragementMessages = {
+    ko: {
+        10: '벌써 25% 완료! 🎉',
+        20: '절반 왔어요! 💪',
+        30: '거의 다 됐어요! 🏃',
+        40: '마지막 문항이에요! ✨'
+    },
+    en: {
+        10: '25% done! 🎉',
+        20: 'Halfway there! 💪',
+        30: 'Almost finished! 🏃',
+        40: 'Last question! ✨'
+    },
+    es: {
+        10: '¡25% completado! 🎉',
+        20: '¡A mitad de camino! 💪',
+        30: '¡Casi terminado! 🏃',
+        40: '¡Última pregunta! ✨'
+    },
+    vi: {
+        10: 'Hoàn thành 25%! 🎉',
+        20: 'Đã nửa chặng đường! 💪',
+        30: 'Gần xong rồi! 🏃',
+        40: 'Câu hỏi cuối cùng! ✨'
+    }
+};
+
+function showEncouragementMessage(questionNumber) {
+    const messages = encouragementMessages[currentLanguage] || encouragementMessages['ko'];
+    const message = messages[questionNumber];
+    
+    if (message) {
+        const container = document.getElementById('encouragement-container');
+        if (container) {
+            const msgEl = document.createElement('div');
+            msgEl.className = 'encouragement-message';
+            msgEl.textContent = message;
+            container.appendChild(msgEl);
+            
+            // 2.5초 후 제거
+            setTimeout(() => {
+                msgEl.remove();
+            }, 2500);
+        }
+    }
+}
+
+// ========================================
+// 로딩 애니메이션 기능
+// ========================================
+function showLoadingAnimation() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.classList.remove('hidden');
+    }
+}
+
+function hideLoadingAnimation() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
+}
+
+// ========================================
+// 진행 상태 저장/복원 기능
+// ========================================
+function saveProgress() {
+    const progress = {
+        questionIndex: currentQuestionIndex,
+        answers: answers,
+        scores: scores,
+        timestamp: Date.now()
+    };
+    localStorage.setItem('temperamentTestProgress', JSON.stringify(progress));
+}
+
+function checkSavedProgress() {
+    const saved = localStorage.getItem('temperamentTestProgress');
+    if (saved) {
+        try {
+            const progress = JSON.parse(saved);
+            // 24시간 이내의 진행 상태만 복원
+            if (Date.now() - progress.timestamp < 24 * 60 * 60 * 1000 && progress.questionIndex > 0) {
+                const banner = document.getElementById('resume-banner');
+                if (banner) {
+                    banner.classList.remove('hidden');
+                }
+            }
+        } catch (e) {
+            localStorage.removeItem('temperamentTestProgress');
+        }
+    }
+}
+
+function resumeTest() {
+    const saved = localStorage.getItem('temperamentTestProgress');
+    if (saved) {
+        try {
+            const progress = JSON.parse(saved);
+            currentQuestionIndex = progress.questionIndex;
+            answers = progress.answers || [];
+            scores = progress.scores || [0, 0, 0, 0];
+            
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            
+            const banner = document.getElementById('resume-banner');
+            if (banner) banner.classList.add('hidden');
+            
+            renderQuestion();
+        } catch (e) {
+            clearSavedProgress();
+            startTest();
+        }
+    }
+}
+
+function clearSavedProgress() {
+    localStorage.removeItem('temperamentTestProgress');
+    const banner = document.getElementById('resume-banner');
+    if (banner) banner.classList.add('hidden');
+}
+
+// ========================================
+// 기존 함수 개선
+// ========================================
+
+// 기존 handleAnswer 함수에 진행 저장 및 격려 메시지 추가
+const originalHandleAnswer = handleAnswer;
+handleAnswer = function(selectedIndex) {
+    // 이전 답변의 점수 제거 (답변 변경 시)
+    if (answers[currentQuestionIndex] !== undefined) {
+        scores[answers[currentQuestionIndex]]--;
+    }
+    
+    // 새 답변 저장 및 점수 추가
+    answers[currentQuestionIndex] = selectedIndex;
+    scores[selectedIndex]++;
+    
+    // 진행 상태 저장
+    saveProgress();
+    
+    const currentQuestions = getCurrentQuestions();
+    if (currentQuestionIndex < currentQuestions.length - 1) {
+        currentQuestionIndex++;
+        
+        // 격려 메시지 표시 (10, 20, 30, 40번 질문에서)
+        if ([10, 20, 30].includes(currentQuestionIndex)) {
+            showEncouragementMessage(currentQuestionIndex);
+        }
+        
+        // 슬라이드 애니메이션으로 전환
+        const container = document.getElementById('question-container');
+        if (container) {
+            container.classList.add('slide-out');
+            setTimeout(() => {
+                container.classList.remove('slide-out');
+                container.classList.add('slide-in');
+                renderQuestion();
+                setTimeout(() => {
+                    container.classList.remove('slide-in');
+                }, 400);
+            }, 200);
+        } else {
+            setTimeout(renderQuestion, 200);
+        }
+    } else {
+        // 마지막 질문 - 결과 표시
+        showLoadingAnimation();
+        
+        // 진행 상태 삭제
+        clearSavedProgress();
+        
+        setTimeout(() => {
+            hideLoadingAnimation();
+            showResult();
+            // 레이더 차트 그리기
+            setTimeout(() => {
+                drawRadarChart('radar-chart', scores, true);
+            }, 100);
+        }, 1500);
+    }
+};
+
+// 기존 startTest 함수 개선
+const originalStartTest = startTest;
+startTest = function() {
+    startScreen.classList.add('hidden');
+    resultScreen.classList.add('hidden');
+    quizScreen.classList.remove('hidden');
+    
+    currentQuestionIndex = 0;
+    scores = [0, 0, 0, 0];
+    answers = [];
+    
+    // 저장된 진행 상태 초기화
+    clearSavedProgress();
+    
+    renderQuestion();
+};
+
+// showResult 함수에서 레이더 차트 그리기
+const originalShowResult = showResult;
+showResult = function() {
+    originalShowResult.call(this);
+    
+    // 약간의 딜레이 후 레이더 차트 그리기
+    setTimeout(() => {
+        drawRadarChart('radar-chart', scores, true);
+    }, 300);
+};
+
